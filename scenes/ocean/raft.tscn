@@ -1,0 +1,60 @@
+[gd_scene load_steps=4 format=3 uid="uid://cvprcmmqwokx7"]
+
+[ext_resource type="PackedScene" uid="uid://ctmgsj5d8fc3b" path="res://models/ocean/raft.blend" id="1_ssx20"]
+[ext_resource type="Texture2D" uid="uid://cw4cdiud8vmsv" path="res://textures/texture.png" id="2_lvioa"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_q4wiv"]
+albedo_texture = ExtResource("2_lvioa")
+
+[node name="raft" instance=ExtResource("1_ssx20")]
+
+[node name="Cube_005" parent="." index="0"]
+material_override = SubResource("StandardMaterial3D_q4wiv")
+
+[node name="BezierCurve" parent="." index="1"]
+material_override = SubResource("StandardMaterial3D_q4wiv")
+
+[node name="BezierCurve_001" parent="." index="2"]
+material_override = SubResource("StandardMaterial3D_q4wiv")
+
+[node name="BezierCurve_002" parent="." index="3"]
+material_override = SubResource("StandardMaterial3D_q4wiv")
+
+[node name="BezierCurve_003" parent="." index="4"]
+material_override = SubResource("StandardMaterial3D_q4wiv")
+
+[node name="BezierCurve_004" parent="." index="5"]
+material_override = SubResource("StandardMaterial3D_q4wiv")
+
+[node name="BezierCurve_005" parent="." index="6"]
+material_override = SubResource("StandardMaterial3D_q4wiv")
+
+[node name="BezierCurve_006" parent="." index="7"]
+material_override = SubResource("StandardMaterial3D_q4wiv")
+
+[node name="BezierCurve_007" parent="." index="8"]
+material_override = SubResource("StandardMaterial3D_q4wiv")
+
+[node name="BezierCurve_008" parent="." index="9"]
+material_override = SubResource("StandardMaterial3D_q4wiv")
+
+[node name="BezierCurve_009" parent="." index="10"]
+material_override = SubResource("StandardMaterial3D_q4wiv")
+
+[node name="BezierCurve_010" parent="." index="11"]
+material_override = SubResource("StandardMaterial3D_q4wiv")
+
+[node name="BezierCurve_011" parent="." index="12"]
+material_override = SubResource("StandardMaterial3D_q4wiv")
+
+[node name="BezierCurve_012" parent="." index="13"]
+material_override = SubResource("StandardMaterial3D_q4wiv")
+
+[node name="BezierCurve_013" parent="." index="14"]
+material_override = SubResource("StandardMaterial3D_q4wiv")
+
+[node name="BezierCurve_014" parent="." index="15"]
+material_override = SubResource("StandardMaterial3D_q4wiv")
+
+[node name="BezierCurve_015" parent="." index="16"]
+material_override = SubResource("StandardMaterial3D_q4wiv")

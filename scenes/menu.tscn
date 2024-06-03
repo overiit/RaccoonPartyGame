@@ -1,0 +1,95 @@
+[gd_scene load_steps=10 format=3 uid="uid://bslpjiwa6kypm"]
+
+[ext_resource type="PackedScene" uid="uid://cyf1ht6trwmot" path="res://scenes/terrain/mountain_range.tscn" id="1_41vsu"]
+[ext_resource type="PackedScene" uid="uid://d0jorgc5mvqhq" path="res://scenes/characters/MainMenuRaccoony.tscn" id="1_ggs10"]
+[ext_resource type="Script" path="res://scripts/LobbyMenu.gd" id="1_ny332"]
+[ext_resource type="FontFile" uid="uid://qt3ysfxx71d1" path="res://fonts/Montserrat-ExtraBold.ttf" id="1_ycbq4"]
+[ext_resource type="PackedScene" uid="uid://cvprcmmqwokx7" path="res://scenes/ocean/raft.tscn" id="2_1h5ah"]
+[ext_resource type="PackedScene" uid="uid://dcxvd218pnpcw" path="res://scenes/terrain/water.tscn" id="4_66cvd"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ukmbp"]
+
+[sub_resource type="Sky" id="Sky_1l8ey"]
+sky_material = SubResource("ProceduralSkyMaterial_ukmbp")
+
+[sub_resource type="Environment" id="Environment_kxj8b"]
+background_mode = 2
+sky = SubResource("Sky_1l8ey")
+tonemap_mode = 2
+glow_enabled = true
+
+[node name="MenuScene" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_kxj8b")
+
+[node name="scene" type="Node" parent="."]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="scene"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.57582)
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="scene"]
+transform = Transform3D(1, 0, 0, 0, 0.99863, -0.052336, 0, 0.052336, 0.99863, 0, 1.659, 8.2)
+fov = 31.6
+
+[node name="mountain_range" parent="scene" instance=ExtResource("1_41vsu")]
+transform = Transform3D(-0.0558215, 0, -0.998441, 0, 1, 0, 0.998441, 0, -0.0558215, 0, 0, -94.9692)
+
+[node name="raft" parent="scene" instance=ExtResource("2_1h5ah")]
+transform = Transform3D(0.920206, 0.0373214, -0.389652, -0.0388801, 0.999236, 0.00388873, 0.3895, 0.0115713, 0.920954, 1.88043, 0, -1.18836)
+
+[node name="raccoony" parent="scene" instance=ExtResource("1_ggs10")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.81091, 0.112413, -0.801295)
+
+[node name="water" parent="scene" instance=ExtResource("4_66cvd")]
+transform = Transform3D(500, 0, 0, 0, 1, 0, 0, 0, 500, 0, 0, 0)
+skeleton = NodePath("../..")
+
+[node name="LobbyMenu" type="CanvasLayer" parent="."]
+script = ExtResource("1_ny332")
+
+[node name="Control" type="Control" parent="LobbyMenu"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="LobbyMenu/Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 25.0
+offset_top = 25.0
+offset_right = -25.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LobbyMenu/Control/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="LobbyMenu/Control/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("1_ycbq4")
+theme_override_font_sizes/font_size = 60
+text = "RACCOONY PARTY"
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="LobbyMenu/Control/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+theme_override_constants/margin_top = 50
+
+[node name="CreateLobby" type="Button" parent="LobbyMenu/Control/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 2
+text = "Create Lobby"
+
+[connection signal="pressed" from="LobbyMenu/Control/MarginContainer/VBoxContainer/CreateLobby" to="LobbyMenu" method="_on_create_lobby_pressed"]

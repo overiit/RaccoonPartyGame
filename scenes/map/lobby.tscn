@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://dqdsiwf35sdxa"]
+
+[ext_resource type="PackedScene" uid="uid://tu1hyuymiywq" path="res://models/maps/lobby.blend" id="1_axu2q"]
+[ext_resource type="Texture2D" uid="uid://cw4cdiud8vmsv" path="res://textures/texture.png" id="2_vso0k"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3m7t1"]
+albedo_texture = ExtResource("2_vso0k")
+
+[node name="lobby" instance=ExtResource("1_axu2q")]
+
+[node name="Lobby" parent="." index="0"]
+material_override = SubResource("StandardMaterial3D_3m7t1")
+
+[node name="Guitar" parent="." index="7"]
+material_override = SubResource("StandardMaterial3D_3m7t1")
+
+[node name="Guitar3" parent="." index="14"]
+material_override = SubResource("StandardMaterial3D_3m7t1")
+
+[node name="Guitar2" parent="." index="21"]
+material_override = SubResource("StandardMaterial3D_3m7t1")
