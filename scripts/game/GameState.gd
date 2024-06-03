@@ -103,6 +103,13 @@ func toggleReady():
 		else:
 			SteamLobbyManager.send_P2P_Packet(0, "unready", {})
 
+func backToLobby():
+	STATE = LobbyState.WAITING_FOR_PLAYERS
+	MODE = null
+	READY_PLAYERS.clear()
+	countdown = WARMUP_TIME
+	pushGameState()
+
 func pushGameState():
 	setState("mode", MODE)
 	setState("state", STATE)

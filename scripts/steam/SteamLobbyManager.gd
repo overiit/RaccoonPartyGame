@@ -88,7 +88,7 @@ func _on_Lobby_Created(_connect: int, lobby_id: int) -> void:
 func joinLobby(lobby_id: int) -> void:
 	if LOBBY_ID > 0:
 		Steam.leaveLobby(LOBBY_ID)
-		
+
 	print("Attempting to join lobby "+str(lobby_id)+"...")
 	
 	get_tree().change_scene_to_file("res://scenes/connecting.tscn")

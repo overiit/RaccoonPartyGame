@@ -35,5 +35,4 @@ func _initialize_Steam() -> void:
 	
 	if IS_OWNED == false:
 		print("User does not own this game")
-		print("ignoring not ownership")
 		get_tree().quit()
