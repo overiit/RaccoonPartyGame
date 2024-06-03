@@ -3,7 +3,12 @@ extends Node
 const LOBBY_TIME = 10.0;
 const WARMUP_TIME = 10.0;
 
-enum LobbyState {
+const k_session_state = "session_state";
+const k_gamemode = "gamemode"
+const k_ready_players = "ready_players"
+const k_countdown = "countdown"
+
+enum SessionState {
 	NONE = 0, # no lobby
 	WAITING_FOR_PLAYERS = 1,
 	INGAME = 2,
@@ -11,8 +16,8 @@ enum LobbyState {
 }
 
 # Global Game State
-var STATE: LobbyState = LobbyState.NONE
-var MODE = null
+var sessionState: SessionState = SessionState.NONE
+var mode = null
 var countdown: float = 0
 
 # Lobby
@@ -38,22 +43,22 @@ func _process(delta):
 ############
 
 func _handleStateChange():
-	if STATE == LobbyState.WAITING_FOR_PLAYERS:
+	if sessionState == SessionState.WAITING_FOR_PLAYERS:
 		print("Switching to lobby...")
 		get_tree().change_scene_to_file("res://scenes/gamelobby.tscn")
-	elif STATE == LobbyState.INGAME:
-		if MODE == "test":
+	elif sessionState == SessionState.INGAME:
+		if mode == "test":
 			print("Switching to test mode")
 			get_tree().change_scene_to_file("res://scenes/testgamemode.tscn")
 		else:
-			print("gamemode unkown: " + str(MODE))
+			print("gamemode unkown: " + str(mode))
 	else:
-		print("state unknown: " + str(STATE))
+		print("state unknown: " + str(sessionState))
 
 
 func startRound():
-	MODE = "test"
-	STATE = LobbyState.INGAME
+	sessionState = SessionState.INGAME
+	mode = "test"
 	READY_PLAYERS.clear()
 	countdown = WARMUP_TIME
 	pushGameState()
@@ -61,7 +66,7 @@ func startRound():
 	pass
 
 func sendCountdown():
-	SteamLobbyManager.send_P2P_Packet(0, "countdown", {
+	SteamLobbyManager.send_P2P_Packet(0, k_countdown, {
 		"time": countdown
 	})
 
@@ -70,7 +75,7 @@ func hostGameLoop(delta):
 	var ready_size = READY_PLAYERS.size()
 	sendCountdown();
 	
-	if STATE == LobbyState.WAITING_FOR_PLAYERS:
+	if sessionState == SessionState.WAITING_FOR_PLAYERS:
 		if lobby_size <= 1:
 			pass
 		if lobby_size == ready_size:
@@ -81,7 +86,7 @@ func hostGameLoop(delta):
 			countdown = LOBBY_TIME
 		if countdown <= 0:
 			startRound()
-	elif STATE == LobbyState.INGAME:
+	elif sessionState == SessionState.INGAME:
 		pass
 	pass
 
@@ -104,17 +109,11 @@ func toggleReady():
 			SteamLobbyManager.send_P2P_Packet(0, "unready", {})
 
 func backToLobby():
-	STATE = LobbyState.WAITING_FOR_PLAYERS
-	MODE = null
+	sessionState = SessionState.WAITING_FOR_PLAYERS
+	mode = null
 	READY_PLAYERS.clear()
 	countdown = WARMUP_TIME
 	pushGameState()
-
-func pushGameState():
-	setState("mode", MODE)
-	setState("state", STATE)
-	setState("ready", READY_PLAYERS)
-	sendCountdown()
 
 func isReady() -> bool:
 	return READY_PLAYERS.has(SteamManager.STEAM_ID)
@@ -131,38 +130,45 @@ func _onLobbyJoined(lobby_id: int):
 	_onLobbyUpdated(lobby_id)
 
 func _onPlayerReady(steam_id: int):
-	if SteamLobbyManager.isHost():
+	if !SteamLobbyManager.isHost():
+		pass
+
+	if sessionState == SessionState.WAITING_FOR_PLAYERS:
 		if not GameState.READY_PLAYERS.has(steam_id):
 			GameState.READY_PLAYERS.append(steam_id)
-			setState("ready", READY_PLAYERS)
+			setState(k_ready_players, READY_PLAYERS)
 
 func _onPlayerUnready(steam_id: int):
 	if SteamLobbyManager.isHost():
 		if GameState.READY_PLAYERS.has(steam_id):
 			GameState.READY_PLAYERS.erase(steam_id)
-			setState("ready", READY_PLAYERS)
+			setState(k_ready_players, READY_PLAYERS)
 
 func _onPlayerLeft(steam_id: int):
 	if SteamLobbyManager.isHost():
 		if GameState.READY_PLAYERS.has(steam_id):
 			GameState.READY_PLAYERS.erase(steam_id)
-			setState("ready", READY_PLAYERS)
+			setState(k_ready_players, READY_PLAYERS)
 
 func _onLobbyUpdated(_lobby_id: int):
-	var _state = getData("state") as LobbyState
-	var _mode = getData("mode")
+	var _sessionState = getData(k_session_state) as SessionState
+	var _mode = getData(k_gamemode)
+	var _readyPlayers = getData(k_ready_players);
+	
+	var changed = sessionState != _sessionState || mode != _mode
+	
 	READY_PLAYERS.clear()
-	READY_PLAYERS.assign(getData("ready"))
-	var changed = STATE != _state
-	STATE = _state
-	MODE = _mode
+	READY_PLAYERS.assign(_readyPlayers)
+	
+	sessionState = _sessionState
+	mode = _mode
 	
 	if changed:
-		print("Lobby Updated: " + str(_state) + ", " + str(_mode))
+		print("Lobby Updated: " + str(_sessionState) + ", " + str(_mode))
 		_handleStateChange()
 	
 func _onLobbyCreated(_lobby_id: int):
-	STATE = LobbyState.WAITING_FOR_PLAYERS
+	sessionState = SessionState.WAITING_FOR_PLAYERS
 	countdown = LOBBY_TIME
 	READY_PLAYERS.clear()
 	pushGameState()
@@ -171,6 +177,13 @@ func _onLobbyCreated(_lobby_id: int):
 ###########
 # CORE UTILS
 ###########
+
+func pushGameState():
+	setState(k_session_state, sessionState)
+	setState(k_gamemode, mode)
+	setState(k_ready_players, READY_PLAYERS)
+	sendCountdown()
+
 func setState(key: String, data: Variant):
 	Steam.setLobbyData(SteamLobbyManager.LOBBY_ID, key, var_to_str(data))
 

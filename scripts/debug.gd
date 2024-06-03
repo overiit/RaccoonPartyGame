@@ -6,15 +6,15 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	var readyPlayers = "Players\n";
+	var readyPlayers = "";
 	for member in SteamLobbyManager.LOBBY_MEMBERS:
 		var isready = GameState.READY_PLAYERS.has(member['steam_id'])
 		readyPlayers += "- " + str(member['steam_name']) + ": " + str(isready) + "\n"
 
 	text = (
 		"Debug: \n" +
-		"State: " + str(GameState.STATE) + "\n" +
-		"Mode: " + str(GameState.MODE) + "\n" +
+		"State: " + str(GameState.sessionState) + "\n" +
+		"Mode: " + str(GameState.mode) + "\n" +
 		"timer: " + str(GameState.countdown) + "\n" +
 		"Players\n" + readyPlayers
 	)
