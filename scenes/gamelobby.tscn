@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/GameLobby.gd" id="1_g738h"]
 [ext_resource type="PackedScene" uid="uid://dqdsiwf35sdxa" path="res://scenes/map/lobby.tscn" id="2_v24rj"]
-[ext_resource type="PackedScene" uid="uid://b074gh2m56u50" path="res://scenes/characters/GameLobbyPlayer.tscn" id="3_73wh4"]
+[ext_resource type="PackedScene" uid="uid://b074gh2m56u50" path="res://scenes/characters/Player.tscn" id="3_73wh4"]
 [ext_resource type="Script" path="res://scripts/multiplayer/MultiplayerSpawner.gd" id="4_2wt5p"]
 [ext_resource type="Script" path="res://scripts/debug.gd" id="5_o0ob8"]
 

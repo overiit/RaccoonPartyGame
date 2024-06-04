@@ -1,0 +1,68 @@
+[gd_scene load_steps=9 format=3 uid="uid://blewm6h2gb3lm"]
+
+[ext_resource type="PackedScene" uid="uid://dxxdix324dcs1" path="res://models/vehicles/jeep_babycar.blend" id="1_7nl5r"]
+[ext_resource type="Script" path="res://scripts/vehicles/wheel.gd" id="2_7x5lj"]
+[ext_resource type="Script" path="res://scripts/vehicles/base_vehicle.gd" id="2_kyuhu"]
+[ext_resource type="Script" path="res://scenes/vehicles/jeep_babycar.gd" id="2_vhq23"]
+[ext_resource type="PackedScene" uid="uid://dynf3uj2e1hlh" path="res://models/vehicles/wheel.blend" id="4_03rj3"]
+[ext_resource type="AudioStream" uid="uid://b8upxonaqey2y" path="res://audio/engine/4000.wav" id="5_a7kju"]
+[ext_resource type="Script" path="res://scripts/vehicles/engine_sound.gd" id="6_oqfta"]
+[ext_resource type="Script" path="res://scripts/vehicles/vehicle_camera.gd" id="8_m108d"]
+
+[node name="jeep_babycar" instance=ExtResource("1_7nl5r")]
+script = ExtResource("2_vhq23")
+
+[node name="Car-rigid" parent="." index="0" node_paths=PackedStringArray("front_left_wheel", "front_right_wheel", "rear_left_wheel", "rear_right_wheel")]
+script = ExtResource("2_kyuhu")
+front_left_wheel = NodePath("FrontLeft")
+front_right_wheel = NodePath("FrontRight")
+rear_left_wheel = NodePath("BackLeft")
+rear_right_wheel = NodePath("BackRight")
+
+[node name="FrontLeft" type="RayCast3D" parent="Car-rigid" index="2" node_paths=PackedStringArray("wheel_node")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1, -0.3, 0.7)
+script = ExtResource("2_7x5lj")
+wheel_node = NodePath("Wheel")
+
+[node name="Wheel" type="Node3D" parent="Car-rigid/FrontLeft" index="0"]
+
+[node name="wheel" parent="Car-rigid/FrontLeft/Wheel" index="0" instance=ExtResource("4_03rj3")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+
+[node name="FrontRight" type="RayCast3D" parent="Car-rigid" index="3" node_paths=PackedStringArray("wheel_node")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1, -0.3, -0.7)
+script = ExtResource("2_7x5lj")
+wheel_node = NodePath("Wheel")
+
+[node name="Wheel" type="Node3D" parent="Car-rigid/FrontRight" index="0"]
+
+[node name="wheel" parent="Car-rigid/FrontRight/Wheel" index="0" instance=ExtResource("4_03rj3")]
+
+[node name="BackLeft" type="RayCast3D" parent="Car-rigid" index="4" node_paths=PackedStringArray("wheel_node")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -0.2, 0.7)
+script = ExtResource("2_7x5lj")
+wheel_node = NodePath("Wheel")
+
+[node name="Wheel" type="Node3D" parent="Car-rigid/BackLeft" index="0"]
+
+[node name="wheel" parent="Car-rigid/BackLeft/Wheel" index="0" instance=ExtResource("4_03rj3")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+
+[node name="BackRight" type="RayCast3D" parent="Car-rigid" index="5" node_paths=PackedStringArray("wheel_node")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -0.2, -0.7)
+script = ExtResource("2_7x5lj")
+wheel_node = NodePath("Wheel")
+
+[node name="Wheel" type="Node3D" parent="Car-rigid/BackRight" index="0"]
+
+[node name="wheel" parent="Car-rigid/BackRight/Wheel" index="0" instance=ExtResource("4_03rj3")]
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="Car-rigid" index="6" node_paths=PackedStringArray("vehicle")]
+stream = ExtResource("5_a7kju")
+max_db = -24.0
+autoplay = true
+script = ExtResource("6_oqfta")
+vehicle = NodePath("..")
+
+[node name="Camera3D" type="Camera3D" parent="." index="1"]
+script = ExtResource("8_m108d")

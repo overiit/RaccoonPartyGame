@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://dkqv2x8pna7l"]
+
+[ext_resource type="PackedScene" uid="uid://blewm6h2gb3lm" path="res://scenes/vehicles/jeep_babycar.tscn" id="1_v68mf"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_87kg8"]
+size = Vector2(100, 100)
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_cwqqy"]
+data = PackedVector3Array(50, 0, 50, -50, 0, 50, 50, 0, -50, -50, 0, 50, -50, 0, -50, 50, 0, -50)
+
+[node name="Race" type="Node3D"]
+
+[node name="jeep_babycar" parent="." instance=ExtResource("1_v68mf")]
+
+[node name="Test World" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_87kg8")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Test World"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Test World/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_cwqqy")

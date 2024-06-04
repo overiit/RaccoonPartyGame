@@ -1,6 +1,6 @@
 extends Node
 
-const LOBBY_TIME = 10.0;
+const LOBBY_TIME = 1.0;
 const WARMUP_TIME = 10.0;
 
 const k_session_state = "session_state";
@@ -50,6 +50,9 @@ func _handleStateChange():
 		if mode == "test":
 			print("Switching to test mode")
 			get_tree().change_scene_to_file("res://scenes/testgamemode.tscn")
+		elif mode == "race":
+			print("Switching to race mode")
+			get_tree().change_scene_to_file("res://scenes/gamemode/race.tscn")
 		else:
 			print("gamemode unkown: " + str(mode))
 	else:
@@ -58,7 +61,7 @@ func _handleStateChange():
 
 func startRound():
 	sessionState = SessionState.INGAME
-	mode = "test"
+	mode = "race"
 	READY_PLAYERS.clear()
 	countdown = WARMUP_TIME
 	pushGameState()
