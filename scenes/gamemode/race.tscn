@@ -1,21 +1,18 @@
 [gd_scene load_steps=4 format=3 uid="uid://dkqv2x8pna7l"]
 
 [ext_resource type="PackedScene" uid="uid://blewm6h2gb3lm" path="res://scenes/vehicles/jeep_babycar.tscn" id="1_v68mf"]
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_87kg8"]
-size = Vector2(100, 100)
-
-[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_cwqqy"]
-data = PackedVector3Array(50, 0, 50, -50, 0, 50, 50, 0, -50, -50, 0, 50, -50, 0, -50, 50, 0, -50)
+[ext_resource type="Environment" uid="uid://b70ydyk4ax5fx" path="res://utils/default_environment.tres" id="1_wnmuf"]
+[ext_resource type="PackedScene" uid="uid://tu1hyuymiywq" path="res://models/maps/lobby.blend" id="3_tskgg"]
 
 [node name="Race" type="Node3D"]
 
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("1_wnmuf")
+
 [node name="jeep_babycar" parent="." instance=ExtResource("1_v68mf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.152252, 0)
 
-[node name="Test World" type="MeshInstance3D" parent="."]
-mesh = SubResource("PlaneMesh_87kg8")
+[node name="lobby" parent="." instance=ExtResource("3_tskgg")]
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Test World"]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Test World/StaticBody3D"]
-shape = SubResource("ConcavePolygonShape3D_cwqqy")
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.609896, 0.792481, 0, -0.792481, 0.609896, 0, 3.13953, 0)

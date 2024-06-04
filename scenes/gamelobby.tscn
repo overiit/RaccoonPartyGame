@@ -1,25 +1,22 @@
 [gd_scene load_steps=7 format=3 uid="uid://b7x8gx0qlua6j"]
 
 [ext_resource type="Script" path="res://scripts/GameLobby.gd" id="1_g738h"]
+[ext_resource type="Environment" uid="uid://b70ydyk4ax5fx" path="res://utils/default_environment.tres" id="2_8apub"]
 [ext_resource type="PackedScene" uid="uid://dqdsiwf35sdxa" path="res://scenes/map/lobby.tscn" id="2_v24rj"]
 [ext_resource type="PackedScene" uid="uid://b074gh2m56u50" path="res://scenes/characters/Player.tscn" id="3_73wh4"]
 [ext_resource type="Script" path="res://scripts/multiplayer/MultiplayerSpawner.gd" id="4_2wt5p"]
 [ext_resource type="Script" path="res://scripts/debug.gd" id="5_o0ob8"]
 
-[sub_resource type="Environment" id="Environment_73n3e"]
-ambient_light_source = 3
-ambient_light_color = Color(7.70092e-06, 0.73263, 0.936545, 1)
-
 [node name="GameLobby" type="Node3D"]
 script = ExtResource("1_g738h")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_73n3e")
-
-[node name="lobby" parent="." instance=ExtResource("2_v24rj")]
+environment = ExtResource("2_8apub")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.708624, 0.3186, 0.629561, 0.609876, -0.172133, 0.773577, 0.35483, 0.932129, -0.0723289, 0, 5.42159, 0)
+
+[node name="lobby" parent="." instance=ExtResource("2_v24rj")]
 
 [node name="Multiplayer" type="Node" parent="."]
 
