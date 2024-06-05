@@ -3,6 +3,11 @@
 class_name Vehicle
 extends RigidBody3D
 
+@export_group ("Audio")
+@export var sample_rpm := 4000.0
+@export var stream: AudioStreamWAV = preload("res://audio/engine/4000.wav")
+var audioStreamPlayer : AudioStreamPlayer3D = AudioStreamPlayer3D.new();
+
 @export_group("Wheel Nodes")
 @export var front_left_wheel : Wheel
 @export var front_right_wheel : Wheel
@@ -95,7 +100,7 @@ extends RigidBody3D
 ## Idle motor RPM.
 @export var idle_rpm := 1000.0
 ## Percentage of torque produced across the RPM range.
-@export var torque_curve : Curve
+@export var torque_curve : Curve = preload("res://utils/default_engine_torque.tres")
 ## Variable motor drag based on RPM.
 @export var motor_drag := 0.005
 ## Constant motor drag.
@@ -270,7 +275,7 @@ extends RigidBody3D
 @export var longitudinal_grip_ratio := { "Road" : 0.5, "Dirt": 0.5, "Grass" : 0.5}
 @export_subgroup("Front Axle", "front_")
 ## Tire radius in meters
-@export var front_tire_radius := 0.3
+@export var front_tire_radius := 0.45 # 0.3
 ## Tire width in millimeters. The width doesn't directly affect tire friction,
 ## but reduces the effects of tire load sensitivity.
 @export var front_tire_width := 245.0
@@ -278,10 +283,10 @@ extends RigidBody3D
 @export var front_wheel_mass := 15.0
 @export_subgroup("Rear Axle", "rear_")
 ## Tire radius in meters
-@export var rear_tire_radius := 0.3
+@export var rear_tire_radius := 0.45 # 0.3
 ## Tire width in millimeters. The width doesn't directly affect tire friction,
 ## but reduces the effects of tire load sensitivity.
-@export var rear_tire_width := 245.0
+@export var rear_tire_width := 360.0 # 245.0
 ## Wheel mass in kilograms.
 @export var rear_wheel_mass := 15.0
 
@@ -387,6 +392,27 @@ class Axle:
 		return slip
 
 func _ready():
+	audioStreamPlayer.autoplay = true;
+	audioStreamPlayer.volume_db = -24;
+	audioStreamPlayer.stream = stream;
+	add_child(audioStreamPlayer)
+
+	for child in get_children():
+		if child is WheelSet:
+			if not front_left_wheel:
+				front_left_wheel = child.front_left_wheel
+			if not front_right_wheel:
+				front_right_wheel = child.front_right_wheel
+			if not rear_left_wheel:
+				rear_left_wheel = child.rear_left_wheel
+			if not rear_right_wheel:
+				rear_right_wheel = child.rear_right_wheel
+			break
+
+	if not front_left_wheel or not front_right_wheel or not rear_left_wheel or not rear_right_wheel:
+		push_error("Wheel nodes not found")
+		return
+
 	initialize()
 
 func _integrate_forces(state : PhysicsDirectBodyState3D):
@@ -537,7 +563,7 @@ func initialize():
 	rear_axle.brake_bias = 1.0 - front_brake_bias
 	
 	for wheel in wheel_array:
-		wheel.initialize()
+		wheel.initialize(self)
 	
 	if front_torque_split > 0.0 or variable_torque_split:
 		front_axle.is_drive_axle = true
@@ -573,7 +599,9 @@ func _physics_process(delta):
 	if !controller.is_mounted():
 		## Dont move car 
 		return
-	
+
+	process_audio()
+
 	## For stability calculations, we need the vehicle body inertia which isn't
 	## available immidiately
 	if not vehicle_inertia:
@@ -596,6 +624,10 @@ func _physics_process(delta):
 	process_drive(delta)
 	process_forces(delta)
 	process_stability()
+
+func process_audio():
+	audioStreamPlayer.pitch_scale = max(abs(motor_rpm / sample_rpm), 0.25)
+	audioStreamPlayer.volume_db = linear_to_db((throttle_amount * 0.5) + 0.5)
 
 func process_drag():
 	var drag = 0.5 * air_density * pow(speed, 2.0) * frontal_area * coefficient_of_drag

@@ -1,14 +1,24 @@
-[gd_scene load_steps=4 format=3 uid="uid://dkqv2x8pna7l"]
+[gd_scene load_steps=6 format=3 uid="uid://dkqv2x8pna7l"]
 
 [ext_resource type="PackedScene" uid="uid://1gfropwtqfbn" path="res://addons/GodotSky/GodotSky.tscn" id="1_c0ria"]
+[ext_resource type="PackedScene" uid="uid://l3di0ug2q6ds" path="res://scenes/entities/vehicles/sportscar_babycar.tscn" id="2_vuiwo"]
 [ext_resource type="Script" path="res://scripts/utils/EntitySpawner.gd" id="3_26xi0"]
-[ext_resource type="PackedScene" uid="uid://tu1hyuymiywq" path="res://models/maps/lobby.blend" id="3_tskgg"]
+[ext_resource type="PackedScene" uid="uid://brsg0pg1alinp" path="res://models/maps/track.blend" id="4_0ohua"]
+[ext_resource type="Material" uid="uid://b3ri53ldiu7v" path="res://utils/default_material.tres" id="5_qbh46"]
 
 [node name="Race" type="Node3D"]
 
 [node name="GodotSky" parent="." instance=ExtResource("1_c0ria")]
 
-[node name="lobby" parent="." instance=ExtResource("3_tskgg")]
+[node name="sportscar_babycar" parent="." instance=ExtResource("2_vuiwo")]
 
 [node name="EntitySpawner" type="Node3D" parent="."]
+visible = false
 script = ExtResource("3_26xi0")
+
+[node name="track" parent="." instance=ExtResource("4_0ohua")]
+
+[node name="Map" parent="track" index="0"]
+material_override = ExtResource("5_qbh46")
+
+[editable path="track"]

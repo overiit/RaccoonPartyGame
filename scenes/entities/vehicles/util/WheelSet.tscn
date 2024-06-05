@@ -1,0 +1,66 @@
+[gd_scene load_steps=5 format=3 uid="uid://b60mlume3trkq"]
+
+[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_wheel_set.gd" id="1_2g4jd"]
+[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_wheel.gd" id="2_5uuy5"]
+[ext_resource type="PackedScene" uid="uid://dynf3uj2e1hlh" path="res://models/entities/vehicles/wheel.blend" id="3_581sm"]
+[ext_resource type="Material" uid="uid://b3ri53ldiu7v" path="res://utils/default_material.tres" id="4_6cxjc"]
+
+[node name="WheelSet" type="Node3D" node_paths=PackedStringArray("front_left_wheel", "front_right_wheel", "rear_left_wheel", "rear_right_wheel")]
+script = ExtResource("1_2g4jd")
+front_left_wheel = NodePath("Frontleft")
+front_right_wheel = NodePath("FrontRight2")
+rear_left_wheel = NodePath("BackLeft2")
+rear_right_wheel = NodePath("BackRight")
+
+[node name="Frontleft" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 0.26, -0.948875)
+script = ExtResource("2_5uuy5")
+
+[node name="Wheel" type="Node3D" parent="Frontleft"]
+
+[node name="wheel" parent="Frontleft/Wheel" instance=ExtResource("3_581sm")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
+
+[node name="Wheel-front-right" parent="Frontleft/Wheel/wheel" index="0"]
+material_override = ExtResource("4_6cxjc")
+
+[node name="FrontRight2" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.26, -0.948875)
+script = ExtResource("2_5uuy5")
+
+[node name="Wheel" type="Node3D" parent="FrontRight2"]
+
+[node name="wheel" parent="FrontRight2/Wheel" instance=ExtResource("3_581sm")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0)
+
+[node name="Wheel-front-right" parent="FrontRight2/Wheel/wheel" index="0"]
+material_override = ExtResource("4_6cxjc")
+
+[node name="BackLeft2" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 0.26, 1.36)
+script = ExtResource("2_5uuy5")
+
+[node name="Wheel" type="Node3D" parent="BackLeft2"]
+
+[node name="wheel" parent="BackLeft2/Wheel" instance=ExtResource("3_581sm")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
+
+[node name="Wheel-front-right" parent="BackLeft2/Wheel/wheel" index="0"]
+material_override = ExtResource("4_6cxjc")
+
+[node name="BackRight" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.26, 1.36)
+script = ExtResource("2_5uuy5")
+
+[node name="Wheel" type="Node3D" parent="BackRight"]
+
+[node name="wheel" parent="BackRight/Wheel" instance=ExtResource("3_581sm")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0)
+
+[node name="Wheel-front-right" parent="BackRight/Wheel/wheel" index="0"]
+material_override = ExtResource("4_6cxjc")
+
+[editable path="Frontleft/Wheel/wheel"]
+[editable path="FrontRight2/Wheel/wheel"]
+[editable path="BackLeft2/Wheel/wheel"]
+[editable path="BackRight/Wheel/wheel"]

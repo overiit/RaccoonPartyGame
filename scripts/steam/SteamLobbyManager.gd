@@ -9,6 +9,8 @@ var LOBBY_MEMBERS: Array = []
 var LOBBY_VOTE_KICK: bool = false
 var LOBBY_MAX_MEMBERS: int = 16
 
+var ConnectingScene = preload("res://scenes/ui/connecting.tscn")
+
 # general
 signal onPacket(steam_id: int, message: String, data: Dictionary)
 # TODO signal onHostChanged(to_steam_id: int)
@@ -98,7 +100,7 @@ func joinLobby(lobby_id: int) -> void:
 
 	print("Attempting to join lobby "+str(lobby_id)+"...")
 	
-	get_tree().change_scene_to_file("res://scenes/connecting.tscn")
+	get_tree().change_scene_to_packed(ConnectingScene)
 	
 	# Clear any previous lobby members lists, if you were in a previous lobby
 	LOBBY_MEMBERS.clear()

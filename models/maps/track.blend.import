@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dy18rqirn5b2p"
-path="res://.godot/imported/#025 Sportscar.blend-b248600b951eae6a23912e71d454c3dd.scn"
+uid="uid://brsg0pg1alinp"
+path="res://.godot/imported/track.blend-3a5d353b66d5715a164a8bef0a217264.scn"
 
 [deps]
 
-source_file="res://models/New Assets/#025 Sportscar.blend"
-dest_files=["res://.godot/imported/#025 Sportscar.blend-b248600b951eae6a23912e71d454c3dd.scn"]
+source_file="res://models/maps/track.blend"
+dest_files=["res://.godot/imported/track.blend-3a5d353b66d5715a164a8bef0a217264.scn"]
 
 [params]
 

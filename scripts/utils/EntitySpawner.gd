@@ -1,7 +1,13 @@
 class_name EntitySpawner
 extends Node3D
 
-@onready var playerScene = load("res://scenes/characters/player.tscn");
+@onready var playerScene = preload("res://scenes/characters/player.tscn");
+
+var GLOBAL_ENTITIES = {
+	"jeep": preload("res://scenes/entities/vehicles/jeep_babycar.tscn"),
+	"sportscar": preload("res://scenes/entities/vehicles/sportscar_babycar.tscn")
+}
+
 var players: Dictionary = {};
 
 var entities = []
@@ -76,15 +82,18 @@ func notifyEntities(steam_id: int):
 func receivedEntities(_data: Dictionary):
 	var data = _data["entities"]
 	for entity in data:
-		spawnEntity(entity["id"], entity["packedScene"], entity["position"], entity["rotation"])
+		spawnEntity(entity["id"], entity["type"], entity["position"], entity["rotation"])
 	pass
 
-func spawnEntity(id: String, packedScene: String, position: Vector3, rotation: Vector3):
-	var scene = load(packedScene);
+func spawnEntity(id: String, type: String, _position: Vector3, _rotation: Vector3):
+	if not GLOBAL_ENTITIES.has(type):
+		print("Warning: Entity type " + type + " does not exist")
+		return
+	var scene = GLOBAL_ENTITIES[type]
 	scene.set_meta("entity_id", id)
 	var entity = scene.instance()
-	entity.position = position
-	entity.rotation = rotation
+	entity.position = _position
+	entity.rotation = _rotation
 
 	# TODO: set rotation
 
@@ -95,7 +104,7 @@ func spawnEntity(id: String, packedScene: String, position: Vector3, rotation: V
 
 	entities.append({
 		"id": id,
-		"packedScene": packedScene,
+		"type": type,
 		"position": position,
 		"rotation": rotation
 	})

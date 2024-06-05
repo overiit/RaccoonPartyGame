@@ -8,6 +8,10 @@ const k_gamemode = "gamemode"
 const k_ready_players = "ready_players"
 const k_countdown = "countdown"
 
+var LobbyScene = preload("res://scenes/gamemode/lobby.tscn")
+var TestGamemode = preload("res://scenes/gamemode/testgamemode.tscn")
+var RaceGamemode = preload("res://scenes/gamemode/race.tscn")
+
 enum SessionState {
 	NONE = 0, # no lobby
 	WAITING_FOR_PLAYERS = 1,
@@ -44,14 +48,14 @@ func _process(delta):
 func _handleStateChange():
 	if sessionState == SessionState.WAITING_FOR_PLAYERS:
 		print("Switching to lobby...")
-		get_tree().change_scene_to_file("res://scenes/gamelobby.tscn")
+		get_tree().change_scene_to_packed(LobbyScene)
 	elif sessionState == SessionState.INGAME:
 		if mode == "test":
 			print("Switching to test mode")
-			get_tree().change_scene_to_file("res://scenes/testgamemode.tscn")
+			get_tree().change_scene_to_packed(TestGamemode)
 		elif mode == "race":
 			print("Switching to race mode")
-			get_tree().change_scene_to_file("res://scenes/gamemode/race.tscn")
+			get_tree().change_scene_to_packed(RaceGamemode)
 		else:
 			print("gamemode unkown: " + str(mode))
 	else:

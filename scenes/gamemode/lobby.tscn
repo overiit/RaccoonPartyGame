@@ -10,6 +10,7 @@
 script = ExtResource("1_g738h")
 
 [node name="GodotSky" parent="." instance=ExtResource("2_pgr8u")]
+timeOfDay = 1784.5
 
 [node name="lobby" parent="." instance=ExtResource("2_v24rj")]
 

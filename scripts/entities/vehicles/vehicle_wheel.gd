@@ -7,10 +7,10 @@
 class_name Wheel
 extends RayCast3D
 
-@export var wheel_node : Node3D = self
+@onready var wheel_node : Node3D 
 
 var wheel_mass := 15.0
-var tire_radius := 0.3
+var tire_radius := 0.45 # 0.3
 var tire_width := 205.0
 var ackermann := 0.15
 var contact_patch := 0.2
@@ -69,6 +69,9 @@ var beam_axle := 0.0
 
 var vehicle : RigidBody3D
 
+func _ready():
+	wheel_node = get_child(0)
+
 func _process(delta):
 	if wheel_node:
 		wheel_node.position.y = min(0, -spring_current_length)
@@ -77,11 +80,13 @@ func _process(delta):
 			wheel_node.rotation.z = wheel_lookat_vector.angle_to(Vector3.RIGHT * beam_axle) * signf(wheel_lookat_vector.y * beam_axle)
 		wheel_node.rotation.x -= (wrapf(spin * delta, 0, TAU))
 		
-func initialize():
+func initialize(_vehicle: Vehicle):
 	wheel_node.rotation_order = EULER_ORDER_ZXY
 	wheel_moment = 0.5 * wheel_mass * pow(tire_radius, 2)
 	set_target_position(Vector3.DOWN * (spring_length + tire_radius))
-	vehicle = get_parent()
+	
+	vehicle = _vehicle
+
 	max_spring_length = spring_length
 	current_cof = coefficient_of_friction[surface_type]
 	current_rolling_resistance = rolling_resistance[surface_type]
@@ -153,11 +158,31 @@ func process_forces(opposite_compression : float, braking : bool, delta : float)
 		if surface_groups.size() > 0:
 			if surface_type != surface_groups[0]:
 				surface_type = surface_groups[0]
-				current_cof = coefficient_of_friction[surface_type]
-				current_rolling_resistance = rolling_resistance[surface_type]
-				current_lateral_grip_assist = lateral_grip_assist[surface_type]
-				current_longitudinal_grip_ratio = longitudinal_grip_ratio[surface_type]
-				current_tire_stiffness = 1000000.0 + 8000000.0 * tire_stiffnesses[surface_type]
+
+				if coefficient_of_friction.has(surface_type):
+					current_cof = coefficient_of_friction[surface_type]
+				else:
+					current_cof = coefficient_of_friction['Road']
+
+				if rolling_resistance.has(surface_type):
+					current_rolling_resistance = rolling_resistance[surface_type]
+				else:
+					current_rolling_resistance = rolling_resistance['Road']
+
+				if lateral_grip_assist.has(surface_type):
+					current_lateral_grip_assist = lateral_grip_assist[surface_type]
+				else:
+					current_lateral_grip_assist = lateral_grip_assist['Road']
+
+				if longitudinal_grip_ratio.has(surface_type):
+					current_longitudinal_grip_ratio = longitudinal_grip_ratio[surface_type]
+				else:
+					current_longitudinal_grip_ratio = longitudinal_grip_ratio['Road']
+				
+				if tire_stiffnesses.has(surface_type):
+					current_tire_stiffness = 1000000.0 + 8000000.0 * tire_stiffnesses[surface_type]
+				else:
+					current_tire_stiffness = 1000000.0 + 8000000.0 * tire_stiffnesses['Road']
 	else:
 		last_collider = null
 	

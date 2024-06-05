@@ -1,10 +1,21 @@
 extends Node3D
 
-@export var camera: Camera3D
-@export var vehicle_node: Vehicle
+var camera: Camera3D
+var vehicle_node: Vehicle
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	for child in get_children():
+		if child is Camera3D:
+			camera = child
+		elif child is Vehicle:
+			vehicle_node = child
+	
+	if vehicle_node == null || camera == null:
+		print("Vehicle or Camera not found")
+		queue_free()
+		return
+
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	camera.set_process(is_authority())
 	#if !is_authority():
