@@ -9,15 +9,21 @@ var LOBBY_MEMBERS: Array = []
 var LOBBY_VOTE_KICK: bool = false
 var LOBBY_MAX_MEMBERS: int = 16
 
+# general
+signal onPacket(steam_id: int, message: String, data: Dictionary)
+
+# lobby
 signal onLobbyCreated(lobby_id: int)
 signal onLobbyJoined(lobby_id: int)
 signal onLobbyUpdated(lobby_id: int)
 
+# player
 signal onPlayerConnected(player_id: int)
 signal onPlayerJoined(player_id: int)
 signal onPlayerLeft(player_id: int)
 signal onPlayerKicked(player_id: int, ban: bool)
 
+# generic game
 signal onCountdownChange(time: float)
 
 # custom

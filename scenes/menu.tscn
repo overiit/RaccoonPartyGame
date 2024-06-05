@@ -1,7 +1,7 @@
 [gd_scene load_steps=17 format=3 uid="uid://bslpjiwa6kypm"]
 
 [ext_resource type="PackedScene" uid="uid://cyf1ht6trwmot" path="res://scenes/terrain/mountain_range.tscn" id="1_41vsu"]
-[ext_resource type="PackedScene" uid="uid://d0jorgc5mvqhq" path="res://scenes/characters/MainMenuRaccoony.tscn" id="1_ggs10"]
+[ext_resource type="PackedScene" uid="uid://d0jorgc5mvqhq" path="res://scenes/characters/cinematics/MainMenuRaccoony.tscn" id="1_ggs10"]
 [ext_resource type="Environment" uid="uid://b70ydyk4ax5fx" path="res://utils/default_environment.tres" id="1_hbyol"]
 [ext_resource type="Script" path="res://scripts/LobbyMenu.gd" id="1_ny332"]
 [ext_resource type="FontFile" uid="uid://qt3ysfxx71d1" path="res://fonts/Montserrat-ExtraBold.ttf" id="1_ycbq4"]
