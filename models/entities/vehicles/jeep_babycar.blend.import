@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dynf3uj2e1hlh"
-path="res://.godot/imported/wheel.blend-61bdff5cc1b76980ae4e289b5b27bf47.scn"
+uid="uid://dxxdix324dcs1"
+path="res://.godot/imported/jeep_babycar.blend-72f9851af42ef46baed4202dc1306bf7.scn"
 
 [deps]
 
-source_file="res://models/vehicles/wheel.blend"
-dest_files=["res://.godot/imported/wheel.blend-61bdff5cc1b76980ae4e289b5b27bf47.scn"]
+source_file="res://models/entities/vehicles/jeep_babycar.blend"
+dest_files=["res://.godot/imported/jeep_babycar.blend-72f9851af42ef46baed4202dc1306bf7.scn"]
 
 [params]
 

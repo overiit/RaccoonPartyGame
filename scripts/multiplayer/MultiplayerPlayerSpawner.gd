@@ -1,7 +1,7 @@
-extends Node
+class_name PlayerSpawner
+extends Node3D
 
-@export var playerScene : PackedScene;
-@export var spawnPath : Node;
+@onready var playerScene = load("res://scenes/characters/player.tscn");
 
 func _ready():
 	spawnPlayer(SteamManager.STEAM_ID)
@@ -25,13 +25,13 @@ func spawnPlayer(id: int):
 	var player = playerScene.instantiate()
 	player.set_meta("steam_id", id)
 	players[id] = player
-	spawnPath.add_child(player)
+	add_child(player)
 	return player
 	
 func removePlayer(id: int):
 	if not players.has(id):
 		print('Player not in list')
 		return
-	spawnPath.remove_child(players[id])
+	remove_child(players[id])
 	players[id].queue_free()
 	players.erase(id);
