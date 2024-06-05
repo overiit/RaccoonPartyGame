@@ -1,16 +1,19 @@
 extends Node3D
 
-@onready var camera = $Camera3D
-@onready var vehicle_node = $"Car-rigid"
+@export var camera: Camera3D
+@export var vehicle_node: Vehicle
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	#camera.set_process(is_authority())
+	camera.set_process(is_authority())
 	#if !is_authority():
 		#SteamLobbyManager.onPlayerMove.connect(_onPlayerMove)
 
 func _physics_process(delta):
+	if !is_authority():
+		return
+
 	vehicle_node.brake_input = Input.get_action_strength("down")
 	vehicle_node.steering_input = Input.get_action_strength("left") - Input.get_action_strength("right")
 	vehicle_node.throttle_input = pow(Input.get_action_strength("up"), 2.0)
@@ -26,11 +29,15 @@ func _physics_process(delta):
 		#position = pos
 		#visual_char.rotation.y = rot.y
 		#anim_player.play(animation)
-		#pass
+		#return
 
 func is_authority() -> bool:
+	return true
 	return get_authority() == SteamManager.STEAM_ID
-	
+
+func is_mounted():
+	return get_authority() > 0
+
 func get_authority() -> int:
 	if has_meta("steam_id"):
 		return get_meta("steam_id")

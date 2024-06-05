@@ -24,6 +24,7 @@ func _initialize_Steam() -> void:
 	if INIT['status'] != 1:
 		print("Failed to initialize Steam. " + str(INIT['verbal']) + " Shutting down...")
 		get_tree().quit()
+		return
 	
 	IS_ONLINE = Steam.loggedOn()
 	IS_OWNED = Steam.isSubscribed()

@@ -31,7 +31,6 @@ func _ready():
 	SteamLobbyManager.onPlayerReady.connect(_onPlayerReady)
 	SteamLobbyManager.onPlayerUnready.connect(_onPlayerUnready)
 	SteamLobbyManager.onPlayerLeft.connect(_onPlayerLeft)
-	pass
 
 func _process(delta):
 	if SteamLobbyManager.LOBBY_ID > 0:
@@ -66,7 +65,6 @@ func startRound():
 	countdown = WARMUP_TIME
 	pushGameState()
 	_handleStateChange()
-	pass
 
 func sendCountdown():
 	SteamLobbyManager.send_P2P_Packet(0, k_countdown, {
@@ -79,8 +77,8 @@ func hostGameLoop(delta):
 	sendCountdown();
 	
 	if sessionState == SessionState.WAITING_FOR_PLAYERS:
-		if lobby_size <= 1:
-			pass
+		if lobby_size <= 0: # change this so 1 person cant play alone
+			return
 		if lobby_size == ready_size:
 			# count down as all are ready
 			countdown -= delta
@@ -91,7 +89,6 @@ func hostGameLoop(delta):
 			startRound()
 	elif sessionState == SessionState.INGAME:
 		pass
-	pass
 
 	
 ###########
@@ -134,7 +131,7 @@ func _onLobbyJoined(lobby_id: int):
 
 func _onPlayerReady(steam_id: int):
 	if !SteamLobbyManager.isHost():
-		pass
+		return
 
 	if sessionState == SessionState.WAITING_FOR_PLAYERS:
 		if not GameState.READY_PLAYERS.has(steam_id):

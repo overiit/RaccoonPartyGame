@@ -1,32 +1,81 @@
-[gd_scene load_steps=10 format=3 uid="uid://bslpjiwa6kypm"]
+[gd_scene load_steps=17 format=3 uid="uid://bslpjiwa6kypm"]
 
 [ext_resource type="PackedScene" uid="uid://cyf1ht6trwmot" path="res://scenes/terrain/mountain_range.tscn" id="1_41vsu"]
 [ext_resource type="PackedScene" uid="uid://d0jorgc5mvqhq" path="res://scenes/characters/MainMenuRaccoony.tscn" id="1_ggs10"]
+[ext_resource type="Environment" uid="uid://b70ydyk4ax5fx" path="res://utils/default_environment.tres" id="1_hbyol"]
 [ext_resource type="Script" path="res://scripts/LobbyMenu.gd" id="1_ny332"]
 [ext_resource type="FontFile" uid="uid://qt3ysfxx71d1" path="res://fonts/Montserrat-ExtraBold.ttf" id="1_ycbq4"]
 [ext_resource type="PackedScene" uid="uid://cvprcmmqwokx7" path="res://scenes/ocean/raft.tscn" id="2_1h5ah"]
 [ext_resource type="PackedScene" uid="uid://dcxvd218pnpcw" path="res://scenes/terrain/water.tscn" id="4_66cvd"]
+[ext_resource type="Shader" path="res://shaders/water.gdshader" id="5_tetet"]
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ukmbp"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_kaj17"]
+noise_type = 2
+frequency = 0.0383
 
-[sub_resource type="Sky" id="Sky_1l8ey"]
-sky_material = SubResource("ProceduralSkyMaterial_ukmbp")
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_nxxhn"]
+seamless = true
+as_normal_map = true
+bump_strength = 0.0
+noise = SubResource("FastNoiseLite_kaj17")
 
-[sub_resource type="Environment" id="Environment_kxj8b"]
-background_mode = 2
-sky = SubResource("Sky_1l8ey")
-tonemap_mode = 2
-glow_enabled = true
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_cuq33"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_suidh"]
+seamless = true
+as_normal_map = true
+bump_strength = 4.0
+noise = SubResource("FastNoiseLite_cuq33")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_kp7tp"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_wl5et"]
+seamless = true
+noise = SubResource("FastNoiseLite_kp7tp")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_u2w2b"]
+render_priority = 0
+shader = ExtResource("5_tetet")
+shader_parameter/albedo = Color(0.0647401, 0.729448, 1, 1)
+shader_parameter/albedo2 = Color(0, 0.508735, 0.889617, 1)
+shader_parameter/metallic = 0.054
+shader_parameter/roughness = 0.02
+shader_parameter/wave_speed = 1.65
+shader_parameter/wave_height = 0.1
+shader_parameter/wave_direction = Vector2(2, 0)
+shader_parameter/wave_direction2 = Vector2(0, 1)
+shader_parameter/time_scale = 0.02
+shader_parameter/noise_scale = 10.0
+shader_parameter/height_scale = 2.595
+shader_parameter/color_deep = Color(0, 0, 0, 1)
+shader_parameter/color_shallow = Color(0.336608, 0.336608, 0.336608, 1)
+shader_parameter/beers_law = 2.0
+shader_parameter/depth_offset = -0.75
+shader_parameter/edge_scale = 0.1
+shader_parameter/near = 1.0
+shader_parameter/far = 25.0
+shader_parameter/edge_color = Color(1, 1, 1, 1)
+shader_parameter/useGlobalPosition = true
+shader_parameter/wave = SubResource("NoiseTexture2D_wl5et")
+shader_parameter/texture_normal = SubResource("NoiseTexture2D_nxxhn")
+shader_parameter/texture_normal2 = SubResource("NoiseTexture2D_suidh")
+
+[sub_resource type="QuadMesh" id="QuadMesh_q1kdl"]
+material = SubResource("ShaderMaterial_u2w2b")
+size = Vector2(300, 300)
+subdivide_width = 200
+subdivide_depth = 200
+orientation = 1
 
 [node name="MenuScene" type="Node3D"]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_kxj8b")
+environment = ExtResource("1_hbyol")
 
 [node name="scene" type="Node" parent="."]
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="scene"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.57582)
+transform = Transform3D(0.999999, -0.00143901, -0.000421504, 0.00148138, 0.904567, 0.426329, -0.000232214, -0.42633, 0.904568, 0, 3.90506, 1.57582)
 shadow_enabled = true
 
 [node name="Camera3D" type="Camera3D" parent="scene"]
@@ -42,8 +91,13 @@ transform = Transform3D(0.920206, 0.0373214, -0.389652, -0.0388801, 0.999236, 0.
 [node name="raccoony" parent="scene" instance=ExtResource("1_ggs10")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.81091, 0.112413, -0.801295)
 
+[node name="MeshInstance3D" type="MeshInstance3D" parent="scene"]
+transform = Transform3D(0.99999, 0.00444403, -0.000558666, -0.00444417, 0.99999, -0.000239641, 0.000557594, 0.000242124, 1, 0, 0, 0)
+mesh = SubResource("QuadMesh_q1kdl")
+
 [node name="water" parent="scene" instance=ExtResource("4_66cvd")]
 transform = Transform3D(500, 0, 0, 0, 1, 0, 0, 0, 500, 0, 0, 0)
+visible = false
 skeleton = NodePath("../..")
 
 [node name="LobbyMenu" type="CanvasLayer" parent="."]
