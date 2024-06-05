@@ -1,17 +1,21 @@
-[gd_scene load_steps=10 format=3 uid="uid://blewm6h2gb3lm"]
+[gd_scene load_steps=12 format=3 uid="uid://blewm6h2gb3lm"]
 
-[ext_resource type="PackedScene" uid="uid://dxxdix324dcs1" path="res://models/vehicles/jeep_babycar.blend" id="1_7nl5r"]
-[ext_resource type="Script" path="res://scripts/vehicles/wheel.gd" id="2_7x5lj"]
-[ext_resource type="Script" path="res://scripts/vehicles/list/jeep_babycar.gd" id="2_3220l"]
-[ext_resource type="Script" path="res://scripts/vehicles/base_vehicle.gd" id="2_kyuhu"]
-[ext_resource type="PackedScene" uid="uid://dynf3uj2e1hlh" path="res://models/vehicles/wheel.blend" id="4_03rj3"]
+[ext_resource type="PackedScene" uid="uid://dxxdix324dcs1" path="res://models/entities/vehicles/jeep_babycar.blend" id="1_7nl5r"]
+[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_wheel.gd" id="2_7x5lj"]
+[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_controller.gd" id="2_3220l"]
+[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_base.gd" id="2_kyuhu"]
+[ext_resource type="PackedScene" uid="uid://dynf3uj2e1hlh" path="res://models/entities/vehicles/wheel.blend" id="4_03rj3"]
+[ext_resource type="Texture2D" uid="uid://cw4cdiud8vmsv" path="res://utils/textures/texture.png" id="4_romwr"]
 [ext_resource type="AudioStream" uid="uid://b8upxonaqey2y" path="res://audio/engine/4000.wav" id="5_a7kju"]
-[ext_resource type="Script" path="res://scripts/vehicles/engine_sound.gd" id="6_oqfta"]
-[ext_resource type="Script" path="res://scripts/vehicles/vehicle_camera.gd" id="8_m108d"]
+[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_sound.gd" id="6_oqfta"]
+[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_camera.gd" id="8_m108d"]
 
 [sub_resource type="Curve" id="Curve_c72f6"]
 _data = [Vector2(0, 0.558864), 0.0, 2.01542, 0, 0, Vector2(0.619863, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.756925), -2.05733, 0.0, 0, 0]
 point_count = 3
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jw7fp"]
+albedo_texture = ExtResource("4_romwr")
 
 [node name="jeep_babycar_controller" node_paths=PackedStringArray("camera", "vehicle_node") instance=ExtResource("1_7nl5r")]
 script = ExtResource("2_3220l")
@@ -35,6 +39,7 @@ rear_damping_ratio = 0.6
 
 [node name="Car-rigid" parent="Car-rigid" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.00758459, 0)
+material_override = SubResource("StandardMaterial3D_jw7fp")
 
 [node name="CollisionShape3D" parent="Car-rigid" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.00758459, 0)

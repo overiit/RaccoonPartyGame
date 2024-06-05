@@ -124,7 +124,7 @@ func _process(delta):
 
 
 func broadcastPosition(steam_id: int = 0):
-	SteamLobbyManager.send_P2P_Packet(0, "pos", {
+	SteamLobbyManager.sendPacket(0, "pos", {
 		"x": position.x,
 		"y": position.y,
 		"z": position.z,

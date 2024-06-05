@@ -11,15 +11,16 @@ config_version=5
 [application]
 
 config/name="RaccoonPartyGame"
-run/main_scene="res://scenes/menu.tscn"
+run/main_scene="res://scenes/ui/menu.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
+boot_splash/bg_color=Color(0.2, 0.2, 0.2, 1)
 config/icon="res://icon.svg"
 
 [autoload]
 
 SteamManager="*res://scripts/steam/SteamManager.gd"
 SteamLobbyManager="*res://scripts/steam/SteamLobbyManager.gd"
-GameState="*res://scripts/game/GameState.gd"
+GameState="*res://scripts/utils/GameState.gd"
 InteractionManager="*res://scripts/utils/InteractionManager.gd"
 
 [input]

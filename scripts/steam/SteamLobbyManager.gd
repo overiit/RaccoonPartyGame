@@ -11,6 +11,7 @@ var LOBBY_MAX_MEMBERS: int = 16
 
 # general
 signal onPacket(steam_id: int, message: String, data: Dictionary)
+# TODO signal onHostChanged(to_steam_id: int)
 
 # lobby
 signal onLobbyCreated(lobby_id: int)
@@ -203,7 +204,7 @@ func _on_Persona_Change(steam_id: int, _flag: int) -> void:
 func _make_P2P_Handshake() -> void:
 	print("Sending P2P handshake to the lobby")
 
-	send_P2P_Packet(0, "handshake", {})
+	sendPacket(0, "handshake", {})
 
 func _on_Lobby_Join_Requested(lobby_id: int, owner_steam_id: int):
 	print("A user has requested to join your lobby.")
@@ -326,7 +327,7 @@ func _handlePacket(steam_id: int, message: String, data: Dictionary):
 	else:
 		print("Packet: "+str(data))
 
-func send_P2P_Packet(target: int, message: String, packet_data: Dictionary) -> void:
+func sendPacket(target: int, message: String, packet_data: Dictionary) -> void:
 	# Set the send_type and channel
 	var SEND_TYPE: int = Steam.P2P_SEND_RELIABLE
 	var CHANNEL: int = 0

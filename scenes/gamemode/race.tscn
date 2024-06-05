@@ -1,18 +1,14 @@
 [gd_scene load_steps=4 format=3 uid="uid://dkqv2x8pna7l"]
 
-[ext_resource type="Environment" uid="uid://b70ydyk4ax5fx" path="res://utils/default_environment.tres" id="1_wnmuf"]
-[ext_resource type="Script" path="res://scripts/multiplayer/MultiplayerPlayerSpawner.gd" id="3_d52iv"]
+[ext_resource type="PackedScene" uid="uid://1gfropwtqfbn" path="res://addons/GodotSky/GodotSky.tscn" id="1_c0ria"]
+[ext_resource type="Script" path="res://scripts/utils/EntitySpawner.gd" id="3_26xi0"]
 [ext_resource type="PackedScene" uid="uid://tu1hyuymiywq" path="res://models/maps/lobby.blend" id="3_tskgg"]
 
 [node name="Race" type="Node3D"]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = ExtResource("1_wnmuf")
+[node name="GodotSky" parent="." instance=ExtResource("1_c0ria")]
 
 [node name="lobby" parent="." instance=ExtResource("3_tskgg")]
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.609896, 0.792481, 0, -0.792481, 0.609896, 0, 3.13953, 0)
-
-[node name="PlayerSpawner" type="Node3D" parent="."]
-script = ExtResource("3_d52iv")
+[node name="EntitySpawner" type="Node3D" parent="."]
+script = ExtResource("3_26xi0")

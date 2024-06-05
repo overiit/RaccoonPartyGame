@@ -1,0 +1,48 @@
+[gd_resource type="Sky" load_steps=3 format=3 uid="uid://bq7217qbtqsdc"]
+
+[ext_resource type="Shader" path="res://addons/GodotSky/Shaders/GodotSky.gdshader" id="1_nrtvd"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_s44jw"]
+shader = ExtResource("1_nrtvd")
+shader_parameter/baseColor = Color(0.340213, 0.48261, 0.743566, 1)
+shader_parameter/scatterColor = Color(1, 1, 1, 1)
+shader_parameter/scatterColor2 = Color(1, 1, 1, 1)
+shader_parameter/bAnimClouds = true
+shader_parameter/bAnimStars = true
+shader_parameter/cloudType = 0
+shader_parameter/sunRadius = null
+shader_parameter/sunEdgeBlur = null
+shader_parameter/sunDiscColor = Color(0, 0, 0, 1)
+shader_parameter/sunGlowColor = null
+shader_parameter/sunlightColor = null
+shader_parameter/sunGlowIntensity = null
+shader_parameter/moonRadius = null
+shader_parameter/moonEdgeBlur = null
+shader_parameter/moonGlowColor = null
+shader_parameter/moonLightColor = null
+shader_parameter/moonGlowIntensity = null
+shader_parameter/baseCloudColor = Color(1, 1, 1, 1)
+shader_parameter/cloudDensity = 7.0
+shader_parameter/cloudEdge = 0.0
+shader_parameter/cloudCoverage = 0.0
+shader_parameter/cloudDirection = Vector2(1, 1)
+shader_parameter/mgSize = 0.92
+shader_parameter/cloudAlpha = 1.0
+shader_parameter/cloudSpeed = 0.001
+shader_parameter/absorption = 5.0
+shader_parameter/henyeyGreensteinLevel = 0.69
+shader_parameter/dynamicCloudBrightness = 0.9
+shader_parameter/horizonUVCurve = null
+shader_parameter/horizonFogColor = null
+shader_parameter/horizonAlpha = 1.0
+shader_parameter/horizonSize = null
+shader_parameter/starColor = null
+shader_parameter/starBrightness = 0.2
+shader_parameter/twinkleSpeed = 0.025
+shader_parameter/twinkleScale = 4.0
+shader_parameter/starResolution = 2.0
+shader_parameter/starSpeed = 0.002
+
+[resource]
+sky_material = SubResource("ShaderMaterial_s44jw")
+process_mode = 3
