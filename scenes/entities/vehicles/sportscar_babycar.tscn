@@ -38,7 +38,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 0.26, 1.39937)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.26, 1.39937)
 
 [node name="Camera3D" type="Camera3D" parent="." index="1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.54964, 2.91279)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.37184, 7.09271)
 script = ExtResource("6_iahr6")
 follow_height = 3
 
