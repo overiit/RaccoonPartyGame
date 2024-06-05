@@ -49,7 +49,6 @@ func _onPlayerMove(steam_id: int, pos: Vector3, rot: Vector3, animation: String)
 		position = pos
 		visual_char.rotation.y = rot.y
 		anim_player.play(animation)
-		pass
 
 func _unhandled_input(event):
 	if event is InputEventMouseMotion:

@@ -206,8 +206,6 @@ func _on_Lobby_Join_Requested(lobby_id: int, owner_steam_id: int):
 	print("Joining %s's lobby..." % owner_name)
 	
 	joinLobby(lobby_id)
-	pass
-
 
 func _on_Lobby_Chat_Update(_lobby_id: int, change_id: int, _making_change_id: int, chat_state: int) -> void:
 	# Get the user who has made the lobby change

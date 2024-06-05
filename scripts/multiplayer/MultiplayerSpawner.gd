@@ -8,7 +8,7 @@ func _ready():
 	onJoin()
 	SteamLobbyManager.onPlayerJoined.connect(spawnPlayer)
 	SteamLobbyManager.onPlayerLeft.connect(removePlayer)
-	pass
+	
 
 func onJoin():
 	for MEMBERS in SteamLobbyManager.LOBBY_MEMBERS:
@@ -21,7 +21,7 @@ var players: Dictionary = {};
 func spawnPlayer(id: int):
 	if players.has(id):
 		print("Warning: Failed spawning "  + str(id) + " as they already exist")
-		pass
+		return
 	var player = playerScene.instantiate()
 	player.set_meta("steam_id", id)
 	players[id] = player
@@ -31,7 +31,7 @@ func spawnPlayer(id: int):
 func removePlayer(id: int):
 	if not players.has(id):
 		print('Player not in list')
-		pass
+		return
 	spawnPath.remove_child(players[id])
 	players[id].queue_free()
 	players.erase(id);

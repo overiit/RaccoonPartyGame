@@ -1,6 +1,6 @@
 # Portions are Copyright (c) 2021 Dechode
 # https://github.com/Dechode/Godot-Advanced-Vehicle
-
+class_name Vehicle
 extends RigidBody3D
 
 @export_group("Wheel Nodes")
@@ -8,6 +8,7 @@ extends RigidBody3D
 @export var front_right_wheel : Wheel
 @export var rear_left_wheel : Wheel
 @export var rear_right_wheel : Wheel
+@onready var controller = $".."
 
 @export_group("Steering")
 ## The rate the steering input changes to smooth input.
@@ -568,6 +569,9 @@ func initialize():
 
 func _physics_process(delta):
 	if not is_ready:
+		return
+	if !controller.is_mounted():
+		## Dont move car 
 		return
 	
 	## For stability calculations, we need the vehicle body inertia which isn't
