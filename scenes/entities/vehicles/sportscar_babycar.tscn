@@ -21,7 +21,6 @@ material_override = ExtResource("4_hjg0c")
 
 [node name="CollisionShape3D" parent="Car-rigid" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.103293, 0)
-visible = false
 
 [node name="WheelSet" parent="Car-rigid" index="2" instance=ExtResource("5_pl5uq")]
 
