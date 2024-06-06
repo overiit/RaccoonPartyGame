@@ -26,13 +26,12 @@ signal onPlayerJoined(player_id: int)
 signal onPlayerLeft(player_id: int)
 signal onPlayerKicked(player_id: int, ban: bool)
 
-# generic game
-signal onCountdownChange(time: float)
-
-# custom
-signal onPlayerMove(steam_id: int, pos: Vector3, rot: Vector3, animation: String)
+# player lobby
 signal onPlayerReady(steam_id: int)
 signal onPlayerUnready(steam_id: int)
+
+# generic game
+signal onCountdownChange(time: float)
 
 const COMPRESSION_GZIP = 3 # File.COMPRESSION_GZIP
 
@@ -320,14 +319,11 @@ func _handlePacket(steam_id: int, message: String, data: Dictionary):
 	elif message == "countdown":
 		onCountdownChange.emit(data['time'])
 	elif message == 'pos':
-		onPlayerMove.emit(
-			steam_id,
-			Vector3(data['x'], data['y'], data['z']),
-			Vector3(0, data['rotY'], 0),
-			data['animation']
-		)
+		pass
 	else:
 		print("Packet: "+str(data))
+		
+	onPacket.emit(steam_id, message, data)
 
 func sendPacket(target: int, message: String, packet_data: Dictionary) -> void:
 	# Set the send_type and channel

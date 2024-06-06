@@ -1,9 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://clx3bkpfjo3f5"]
+[gd_scene load_steps=9 format=3 uid="uid://clx3bkpfjo3f5"]
 
 [ext_resource type="PackedScene" uid="uid://dxxdix324dcs1" path="res://models/entities/vehicles/jeep_babycar.blend" id="1_7nl5r"]
 [ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_controller.gd" id="2_3220l"]
 [ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_base.gd" id="2_kyuhu"]
 [ext_resource type="Texture2D" uid="uid://cw4cdiud8vmsv" path="res://utils/textures/texture.png" id="4_romwr"]
+[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_mount.gd" id="6_1inwd"]
 [ext_resource type="PackedScene" uid="uid://b60mlume3trkq" path="res://scenes/entities/vehicles/util/WheelSet.tscn" id="7_nnha0"]
 [ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_camera.gd" id="8_m108d"]
 
@@ -12,7 +13,6 @@ albedo_texture = ExtResource("4_romwr")
 
 [node name="jeep_babycar_controller" instance=ExtResource("1_7nl5r")]
 script = ExtResource("2_3220l")
-metadata/steam_id = 76561198937360560
 
 [node name="Car-rigid" parent="." index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.445529, 0)
@@ -36,6 +36,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 0.26, 1.35224)
 
 [node name="BackRight" parent="Car-rigid/WheelSet" index="3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.26, 1.35224)
+
+[node name="VehicleMount" type="Node3D" parent="Car-rigid" index="3"]
+script = ExtResource("6_1inwd")
 
 [node name="Camera3D" type="Camera3D" parent="." index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.616738, 4.34669, 5.95355)

@@ -5,10 +5,11 @@ var interactables = []
 func _ready():
 	pass
 
-func add_interactable(interactable):
+func add_interactable(interactable: Node):
 	interactables.append(interactable)
-
-func remove_interactable(interactable):
+	interactable.child_exiting_tree.connect(_onExit)
+	
+func _onExit(interactable: Node):
 	interactables.erase(interactable)
 
 func get_interactables():

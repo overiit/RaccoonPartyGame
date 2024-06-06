@@ -13,15 +13,18 @@ func _ready():
 		if child is Vehicle:
 			follow_this = child
 			break
-
+	
 	start_rotation = rotation
 	start_position = position
-
-func _process(_delta):
+	
 	if follow_this == null:
 		print("No vehicle to follow")
 		return
 
+func _process(_delta):
+	if follow_this == null:
+		return
+		
 	var delta_v := global_transform.origin - follow_this.global_transform.origin
 	delta_v.y = 0.0
 	if (delta_v.length() > follow_distance):

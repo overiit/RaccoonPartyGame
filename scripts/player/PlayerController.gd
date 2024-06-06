@@ -1,11 +1,14 @@
+class_name Player
 extends CharacterBody3D
 
 enum ViewMode { FIRST_PERSON, THIRD_PERSON }
 
-@onready var camera = $camera_mount/Camera3D
+@onready var camera : Camera3D = $camera_mount/Camera3D
 @onready var anim_player = $raccoony/AnimationPlayer
 @onready var camera_mount = $camera_mount
 @onready var visual_char = $raccoony
+@onready var interact_label = $Control/VBoxContainer/InteractLabel
+@onready var collisionShape = $CollisionShape3D
 
 @export
 var PlayerViewMode = ViewMode.THIRD_PERSON
@@ -30,6 +33,8 @@ var items = []
 
 var gravity = 20
 
+var mounted_to : Mountable = null
+
 func is_authority() -> bool:
 	return get_authority() == SteamManager.STEAM_ID
 	
@@ -40,17 +45,45 @@ func get_authority() -> int:
 
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	camera.set_process(is_authority())
-	if !is_authority():
-		SteamLobbyManager.onPlayerMove.connect(_onPlayerMove)
+	camera.set_current(is_authority()) 
+	SteamLobbyManager.onPacket.connect(_onPacket)
 
-func _onPlayerMove(steam_id: int, pos: Vector3, rot: Vector3, animation: String):
+func _onPacket(steam_id: int, message: String, data: Dictionary):
+	if message == "pos":
+		onPlayerMove(
+			steam_id,
+			Vector3(data['x'], data['y'], data['z']),
+			Vector3(0, data['rotY'], 0),
+			data['animation']
+		)
+
+func onEntityMount(entity: Mountable):
+	velocity = Vector3.ZERO
+	collisionShape.disabled = true
+	axis_lock_linear_x = true
+	axis_lock_linear_y = true
+	axis_lock_linear_z = true
+	camera.set_current(false)
+	mounted_to = entity
+	
+func onEntityUnmount():
+	velocity = Vector3.ZERO
+	collisionShape.disabled = false
+	axis_lock_linear_x = false
+	axis_lock_linear_y = false
+	axis_lock_linear_z = false
+	camera.set_current(true)
+	mounted_to = null
+
+func onPlayerMove(steam_id: int, pos: Vector3, rot: Vector3, animation: String):
 	if get_authority() == steam_id:
 		position = pos
 		visual_char.rotation.y = rot.y
 		anim_player.play(animation)
 
 func _unhandled_input(event):
+	if mounted_to != null:
+		return
 	if event is InputEventMouseMotion:
 		repositionCamera(event.relative.x, event.relative.y);
 		
@@ -77,6 +110,14 @@ func _physics_process(delta):
 	if !is_authority():
 		return
 		
+	update_closest_interactable();
+	
+	if mounted_to != null:
+		if Input.is_action_just_pressed("jump"):
+			mounted_to.unmount()
+			pass
+		return
+	
 	repositionCamera(0, 0)
 	var input_dir = Input.get_vector("left", "right", "up", "down")
 	var input_vector = Vector3(input_dir.x, 0, input_dir.y)  
@@ -119,7 +160,7 @@ func _physics_process(delta):
 func _process(delta):
 	if !is_authority():
 		return
-	# limit to 60 ticks even if game is 144 ticks
+	# TODO limit to 60 ticks even if game is 144 ticks
 	broadcastPosition();
 
 
@@ -131,7 +172,6 @@ func broadcastPosition(steam_id: int = 0):
 		"rotY": visual_char.rotation.y,
 		"animation": anim_player.current_animation,
 	})
-	
 
 func play_animation():
 	match state:
@@ -150,3 +190,45 @@ func play_animation():
 		States.DROP_RUN_ROLL:
 			anim_player.play("Crouch")
 			return "Crouch";
+
+
+########
+# Interactions
+########
+
+var closest_interactable : Interactable = null
+
+func update_closest_interactable():
+	# no interactions while in car for now.
+	if mounted_to != null:
+		return
+	
+	
+	var interactables = InteractionManager.get_interactables()
+	var closest_distance = INF
+	var closest = null
+	var player_pos = self.global_transform.origin
+	
+	for interactable in interactables:
+		var object_pos = interactable.global_transform.origin
+		var distance = player_pos.distance_to(object_pos)
+		if distance < closest_distance:
+			closest = interactable
+			closest_distance = distance
+
+	if closest_distance <= interact_distance_threshold:
+		closest_interactable = closest
+	else: 
+		closest_interactable = null
+		
+	interact_label.visible = closest_interactable != null
+	
+	if closest_interactable != null:
+		if 'interact_message' in closest_interactable and closest_interactable.interact_message != null:
+			interact_label.text = closest_interactable.interact_message
+	
+	if Input.is_action_just_pressed("interact") and closest_interactable != null:
+		if closest_interactable.has_method("interact"):
+			closest_interactable.interact()
+		else:
+			print("Interactable has no interaction method. ")

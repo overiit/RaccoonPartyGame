@@ -3,14 +3,10 @@ extends Node3D
 
 @onready var playerScene = preload("res://scenes/characters/player.tscn");
 
-var GLOBAL_ENTITIES = {
+@onready var GLOBAL_ENTITIES = {
 	"jeep": preload("res://scenes/entities/vehicles/jeep_babycar.tscn"),
 	"sportscar": preload("res://scenes/entities/vehicles/sportscar_babycar.tscn")
 }
-
-var players: Dictionary = {};
-
-var entities = []
 
 func _ready():
 	spawnPlayer(SteamManager.STEAM_ID)
@@ -24,6 +20,10 @@ func _ready():
 	else:
 		SteamLobbyManager.sendPacket(SteamLobbyManager.getHost(), "request_entities", {})
 	pass
+	
+func _exit_tree():
+	EntityManager.players.clear()
+	EntityManager.entities.clear()
 
 ######
 # Players
@@ -36,47 +36,47 @@ func onJoin():
 			spawnPlayer(steam_id)
 
 func spawnPlayer(id: int):
-	if players.has(id):
+	if EntityManager.players.has(id):
 		print("Warning: Failed spawning "  + str(id) + " as they already exist")
 		return
 	var player = playerScene.instantiate()
 	player.set_meta("steam_id", id)
-	players[id] = player
+	EntityManager.players[id] = player
 	add_child(player)
 	return player
 	
 func removePlayer(id: int):
-	if not players.has(id):
+	if not EntityManager.players.has(id):
 		print('Player not in list')
 		return
-	remove_child(players[id])
-	players[id].queue_free()
-	players.erase(id);
+	remove_child(EntityManager.players[id])
+	EntityManager.players[id].queue_free()
+	EntityManager.players.erase(id);
 
 
 ######
 # Entities
 ######
 
-func _onPacket(steam_id: int, message: String, data: Dictionary):
+func _onPacket(sender: int, message: String, data: Dictionary):
 	# If I am the host, handle the message
 	if SteamLobbyManager.isHost():
 		if message == "request_entities":
-			notifyEntities(steam_id)
+			notifyEntities(sender)
 		return
 	else:
 		# if sender is not the host, ignore the message
-		if steam_id != SteamLobbyManager.getHost():
+		if sender != SteamLobbyManager.getHost():
 			return 
 		
-		if message == "notify_entities":
+		if message == "entities":
 			receivedEntities(data)
 
 func notifyEntities(steam_id: int):
 	var data = {
-		"entities": entities
+		"entities": EntityManager.entities
 	}
-	SteamLobbyManager.sendPacket(steam_id, "notify_entities", data)
+	SteamLobbyManager.sendPacket(steam_id, "entities", data)
 	pass
 
 func receivedEntities(_data: Dictionary):
@@ -89,27 +89,26 @@ func spawnEntity(id: String, type: String, _position: Vector3, _rotation: Vector
 	if not GLOBAL_ENTITIES.has(type):
 		print("Warning: Entity type " + type + " does not exist")
 		return
-	var scene = GLOBAL_ENTITIES[type]
-	scene.set_meta("entity_id", id)
-	var entity = scene.instance()
-	entity.position = _position
-	entity.rotation = _rotation
-
-	# TODO: set rotation
 
 	# check if entity already exists
-	for e in entities:
-		if e["id"] == id:
-			return 
+	if not EntityManager.entities.has(id):
+		EntityManager.entities[id] = {
+			"id": id,
+			"type": type,
+			"position": _position,
+			"rotation": _rotation,
+			"meta": {},
+		}
+	# add if doesnt exist
+	if not EntityManager.entityNodes.has(id):
+		var scene = GLOBAL_ENTITIES[type]
+		scene.set_meta("entity_id", id)
+		var entity = scene.instantiate()
+		entity.position = _position
+		entity.rotation = _rotation
+		EntityManager.entityNodes[id] = entity
+		add_child(entity)
 
-	entities.append({
-		"id": id,
-		"type": type,
-		"position": position,
-		"rotation": rotation
-	})
-
-	add_child(entity)
 
 	if SteamLobbyManager.isHost():
 		notifyEntities(0)

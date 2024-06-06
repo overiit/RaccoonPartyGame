@@ -9,11 +9,11 @@ extends RigidBody3D
 var audioStreamPlayer : AudioStreamPlayer3D = AudioStreamPlayer3D.new();
 
 @export_group("Wheel Nodes")
-@export var front_left_wheel : Wheel
-@export var front_right_wheel : Wheel
-@export var rear_left_wheel : Wheel
-@export var rear_right_wheel : Wheel
-@onready var controller = $".."
+var front_left_wheel : Wheel
+var front_right_wheel : Wheel
+var rear_left_wheel : Wheel
+var rear_right_wheel : Wheel
+@onready var controller: VehicleController = $".."
 
 @export_group("Steering")
 ## The rate the steering input changes to smooth input.
@@ -596,10 +596,6 @@ func initialize():
 func _physics_process(delta):
 	if not is_ready:
 		return
-	if !controller.is_mounted():
-		## Dont move car 
-		return
-
 	process_audio()
 
 	## For stability calculations, we need the vehicle body inertia which isn't
@@ -618,16 +614,24 @@ func _physics_process(delta):
 	process_braking(delta)
 	process_steering(delta)
 	process_throttle(delta)
-	process_motor(delta)
-	process_clutch(delta)
-	process_transmission(delta)
+	if controller.vehicle_mount != null && controller.vehicle_mount.is_mounted():
+		process_motor(delta)
+		process_clutch(delta)
+		process_transmission(delta)
 	process_drive(delta)
 	process_forces(delta)
 	process_stability()
+	process_network()
+	
+	
 
 func process_audio():
-	audioStreamPlayer.pitch_scale = max(abs(motor_rpm / sample_rpm), 0.25)
-	audioStreamPlayer.volume_db = linear_to_db((throttle_amount * 0.5) + 0.5)
+	if controller.vehicle_mount != null && controller.vehicle_mount.is_mounted():
+		audioStreamPlayer.stream_paused = false
+		audioStreamPlayer.pitch_scale = max(abs(motor_rpm / sample_rpm), 0.25)
+		audioStreamPlayer.volume_db = linear_to_db((throttle_amount * 0.5) + 0.5)
+	else:
+		audioStreamPlayer.stream_paused = true
 
 func process_drag():
 	var drag = 0.5 * air_density * pow(speed, 2.0) * frontal_area * coefficient_of_drag
@@ -971,6 +975,48 @@ func process_stability():
 			apply_torque(global_transform.basis.y * stability_yaw_torque)
 	
 	stability_active = is_stability_on
+
+func process_network():
+	controller.broadcast();
+
+func set_idle():
+		local_velocity = Vector3.ZERO
+		previous_global_position = Vector3.ZERO
+		speed = 0.0
+		motor_rpm = 0.0
+		
+		#steering_amount = 0.0
+		#steering_exponent_amount = 0.0
+		#true_steering_amount = 0.0
+		#throttle_amount = 0.0
+		#brake_amount = 0.0
+		#clutch_amount = 0.0
+		#current_gear = 0
+		#requested_gear = 0
+		#torque_output = 0.0
+		#clutch_torque = 0.0
+		#max_clutch_torque = 0.0
+		#drive_axles_inertia = 0.0
+		#complete_shift_delta_time = 0.0
+		#last_shift_delta_time = 0.0
+		#average_drive_wheel_radius = 0.0
+		#current_torque_split = 0.0
+		#true_torque_split = 0.0
+		#brake_force = 0.0
+		#max_brake_force = 0.0
+		#handbrake_force = 0.0
+		#max_handbrake_force = 0.0
+		#is_braking = false
+		#motor_is_redline = false
+		#is_shifting = false
+		#is_up_shifting = false
+		#need_clutch = false
+		#tcs_active = false
+		#stability_active = false
+		#stability_yaw_torque = 0.0
+		#stability_torque_vector = Vector3.ZERO
+		#front_axle_position = Vector3.ZERO
+		#rear_axle_position = Vector3.ZERO
 
 func manual_shift(count : int):
 	if not automatic_transmission:

@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3 uid="uid://b074gh2m56u50"]
+
+[ext_resource type="Script" path="res://scripts/player/PlayerController.gd" id="1_wydbl"]
+[ext_resource type="PackedScene" uid="uid://b08h1wjm624o8" path="res://models/characters/raccoony.blend" id="2_2ihpa"]
+[ext_resource type="Material" uid="uid://b3ri53ldiu7v" path="res://utils/default_material.tres" id="3_dl3db"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_c1clb"]
+radius = 0.297623
+height = 1.32233
+
+[node name="CharacterBody3D" type="CharacterBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.99167, 0)
+script = ExtResource("1_wydbl")
+
+[node name="raccoony" parent="." instance=ExtResource("2_2ihpa")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.993362, 0)
+
+[node name="Cube" parent="raccoony/Armature/Skeleton3D" index="0"]
+material_override = ExtResource("3_dl3db")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.323949, 0)
+shape = SubResource("CapsuleShape3D_c1clb")
+
+[node name="camera_mount" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.247, 0)
+
+[node name="Camera3D" type="Camera3D" parent="camera_mount"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.44763)
+
+[editable path="raccoony"]
