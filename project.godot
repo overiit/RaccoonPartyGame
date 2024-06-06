@@ -10,11 +10,13 @@ config_version=5
 
 [application]
 
-config/name="RaccoonPartyGame"
+config/name="Raty"
 run/main_scene="res://scenes/ui/menu.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
-boot_splash/bg_color=Color(0.2, 0.2, 0.2, 1)
-config/icon="res://icon.svg"
+boot_splash/bg_color=Color(0.299547, 0.299547, 0.299547, 1)
+boot_splash/image="res://assets/RATY_PNG.png"
+boot_splash/fullsize=false
+config/icon="res://assets/RATY_ICON.png"
 
 [autoload]
 

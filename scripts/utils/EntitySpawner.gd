@@ -81,36 +81,41 @@ func notifyEntities(steam_id: int):
 
 func receivedEntities(_data: Dictionary):
 	var data = _data["entities"]
-	for entity in data:
+	
+	for key in data.keys():
+		var entity = data[key]
 		spawnEntity(entity["id"], entity["type"], entity["position"], entity["rotation"])
 	pass
 
-func spawnEntity(id: String, type: String, _position: Vector3, _rotation: Vector3):
+func spawnEntity(id: int, type: String, _position: Vector3, _rotation: Vector3):
 	if not GLOBAL_ENTITIES.has(type):
 		print("Warning: Entity type " + type + " does not exist")
 		return
 
-	# check if entity already exists
-	if not EntityManager.entities.has(id):
-		EntityManager.entities[id] = {
-			"id": id,
-			"type": type,
-			"position": _position,
-			"rotation": _rotation,
-			"meta": {},
-		}
 	# add if doesnt exist
-	if not EntityManager.entityNodes.has(id):
-		var scene = GLOBAL_ENTITIES[type]
-		scene.set_meta("entity_id", id)
-		var entity = scene.instantiate()
-		entity.position = _position
-		entity.rotation = _rotation
-		EntityManager.entityNodes[id] = entity
-		add_child(entity)
-
+	#if EntityManager.entityNodes.has(id):
+		#EntityManager.entityNodes.erase(id)
+	
+	EntityManager.entities[id] = {
+		"id": id,
+		"type": type,
+		"position": _position,
+		"rotation": _rotation,
+		"meta": {},
+	}
+	
+	var scene = GLOBAL_ENTITIES[type]
+	var entity = scene.instantiate()
+	var ent = Utils.findNodeOfType(entity, Entity)
+	ent.set_entity_id(id)
+	entity.position = _position
+	entity.rotation = _rotation
+	EntityManager.entityNodes[id] = entity
+	add_child(entity)
+	
 
 	if SteamLobbyManager.isHost():
 		notifyEntities(0)
+		print(EntityManager.entities)
 
 	return

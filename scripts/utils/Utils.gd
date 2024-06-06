@@ -1,5 +1,7 @@
 extends Node
 
+var lastVehileId = 1000000000
+
 func findNodeOfType(parent: Node, type):
 	for child in parent.get_children():
 		if is_instance_of(child, type):

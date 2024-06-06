@@ -10,13 +10,17 @@ func _ready():
 	InteractionManager.add_interactable(self)
 	SteamLobbyManager.onPacket.connect(onPacket)
 
+func _exit_tree():	
+	InteractionManager.interactables.erase(interactable)
+
 func onPacket(steam_id: int, message: String, data: Dictionary):
 	if SteamLobbyManager.isHost():
 		if message == "interact":
-			_onInteract(steam_id)
+			if data['entity_id'] == entity_id:
+				_onInteract(steam_id)
 
 func onInteract(steam_id: int):
-	print(str(steam_id) + " interacted with " + str(get_entity_id()))
+	print(str(steam_id) + " interacted with " + str(entity_id))
 	pass
 
 func _onInteract(steam_id: int):
@@ -27,7 +31,7 @@ func _onInteract(steam_id: int):
 func interact():
 	if !SteamLobbyManager.isHost():
 		SteamLobbyManager.sendPacket(SteamLobbyManager.getHost(), "interact", {
-			"entity_id": get_entity_id(),
+			"entity_id": entity_id,
 		})
 		return
 	else:

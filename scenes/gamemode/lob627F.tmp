@@ -56,29 +56,16 @@ layout_mode = 2
 text = "READY"
 
 [node name="EntitySpawner" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.19816, 0)
 script = ExtResource("5_g56wh")
 
 [node name="VehicleSpawner" type="Node3D" parent="." node_paths=PackedStringArray("entitySpawner")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.850307, -12.0757)
-script = ExtResource("6_dnvnj")
-entitySpawner = NodePath("../EntitySpawner")
-entity_to_spawn = "jeep"
-
-[node name="VehicleSpawner4" type="Node3D" parent="." node_paths=PackedStringArray("entitySpawner")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.8559, 0.850307, -15.821)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.82209, -12.0757)
 script = ExtResource("6_dnvnj")
 entitySpawner = NodePath("../EntitySpawner")
 entity_to_spawn = "jeep"
 
 [node name="VehicleSpawner2" type="Node3D" parent="." node_paths=PackedStringArray("entitySpawner")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.850307, 11.7913)
-script = ExtResource("6_dnvnj")
-entitySpawner = NodePath("../EntitySpawner")
-entity_to_spawn = "sportscar"
-
-[node name="VehicleSpawner3" type="Node3D" parent="." node_paths=PackedStringArray("entitySpawner")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.20915, 0.850307, 11.7913)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.82209, 11.7913)
 script = ExtResource("6_dnvnj")
 entitySpawner = NodePath("../EntitySpawner")
 entity_to_spawn = "sportscar"

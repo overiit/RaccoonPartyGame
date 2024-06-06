@@ -40,9 +40,31 @@ func _physics_process(delta):
 		vehicle_node.throttle_input = Input.get_action_strength("down")
 
 func broadcast():
-	if vehicle_mount == null || !vehicle_mount.is_authority():
+	if (
+		vehicle_mount == null &&
+		!SteamLobbyManager.isHost()
+	) || vehicle_mount.get_authority() > 0 && !vehicle_mount.is_authority():
 		return
+	
+	var datapacket = {
+		"id": vehicle_mount.entity_id,
+		# Broadcast everything
+		"global_position": vehicle_node.global_position,
+		"global_transform": vehicle_node.global_transform,
+		"velocity": vehicle_node.local_velocity,
+		"angular_velocity": vehicle_node.angular_velocity,
 
-	SteamLobbyManager.sendPacket(0, "entity_move", {
-		"id": vehicle_mount.get_authority(),
-	})
+		"speed": vehicle_node.speed,
+		"motor_rpm": vehicle_node.motor_rpm,
+		"steering_amount": vehicle_node.steering_amount,
+		"throttle_amount": vehicle_node.throttle_amount,
+		"brake_amount": vehicle_node.brake_amount,
+		"clutch_amount": vehicle_node.clutch_amount,
+		"current_gear": vehicle_node.current_gear,
+		"torque_output": vehicle_node.torque_output,
+		"clutch_torque": vehicle_node.clutch_torque,
+	}
+
+	#print(datapacket)
+
+	SteamLobbyManager.sendPacket(0, "entity_move", datapacket)

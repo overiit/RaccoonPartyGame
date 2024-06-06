@@ -320,8 +320,10 @@ func _handlePacket(steam_id: int, message: String, data: Dictionary):
 		onCountdownChange.emit(data['time'])
 	elif message == 'pos':
 		pass
+	elif message == "entity_move":
+		pass
 	else:
-		print("Packet: "+str(data))
+		print("Packet " + message + ": "+str(data))
 		
 	onPacket.emit(steam_id, message, data)
 

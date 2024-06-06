@@ -7,10 +7,6 @@ func _ready():
 
 func add_interactable(interactable: Node):
 	interactables.append(interactable)
-	interactable.child_exiting_tree.connect(_onExit)
 	
-func _onExit(interactable: Node):
-	interactables.erase(interactable)
-
 func get_interactables():
 	return interactables

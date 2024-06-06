@@ -63,8 +63,9 @@ func onEntityMount(entity: Mountable):
 	axis_lock_linear_x = true
 	axis_lock_linear_y = true
 	axis_lock_linear_z = true
-	camera.set_current(false)
 	mounted_to = entity
+	if is_authority():
+		camera.set_current(false)
 	
 func onEntityUnmount():
 	velocity = Vector3.ZERO
@@ -72,14 +73,16 @@ func onEntityUnmount():
 	axis_lock_linear_x = false
 	axis_lock_linear_y = false
 	axis_lock_linear_z = false
-	camera.set_current(true)
 	mounted_to = null
+	if is_authority():
+		camera.set_current(true)
 
 func onPlayerMove(steam_id: int, pos: Vector3, rot: Vector3, animation: String):
 	if get_authority() == steam_id:
 		position = pos
 		visual_char.rotation.y = rot.y
-		anim_player.play(animation)
+		if animation.length() > 0:
+			anim_player.play(animation)
 
 func _unhandled_input(event):
 	if mounted_to != null:
@@ -208,13 +211,14 @@ func update_closest_interactable():
 	var closest_distance = INF
 	var closest = null
 	var player_pos = self.global_transform.origin
-	
+
 	for interactable in interactables:
-		var object_pos = interactable.global_transform.origin
-		var distance = player_pos.distance_to(object_pos)
-		if distance < closest_distance:
-			closest = interactable
-			closest_distance = distance
+		if 'global_transform' in interactable:
+			var object_pos = interactable.global_transform.origin
+			var distance = player_pos.distance_to(object_pos)
+			if distance < closest_distance:
+				closest = interactable
+				closest_distance = distance
 
 	if closest_distance <= interact_distance_threshold:
 		closest_interactable = closest

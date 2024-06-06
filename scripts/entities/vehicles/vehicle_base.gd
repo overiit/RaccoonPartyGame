@@ -391,7 +391,15 @@ class Axle:
 			slip = maxf(slip, wheel.slip_vector.y)
 		return slip
 
+func onEntityMove(steam_id: int, message: String, data: Dictionary):
+	if message == "entity_move":
+		if controller.vehicle_mount.entity_id == data['id']:
+			global_position = data['global_position']
+			global_transform = data['global_transform']
+			#print(data)
+	
 func _ready():
+	SteamLobbyManager.onPacket.connect(onEntityMove)
 	audioStreamPlayer.autoplay = true;
 	audioStreamPlayer.volume_db = -24;
 	audioStreamPlayer.stream = stream;
@@ -622,14 +630,13 @@ func _physics_process(delta):
 	process_forces(delta)
 	process_stability()
 	process_network()
-	
-	
+
 
 func process_audio():
 	if controller.vehicle_mount != null && controller.vehicle_mount.is_mounted():
 		audioStreamPlayer.stream_paused = false
 		audioStreamPlayer.pitch_scale = max(abs(motor_rpm / sample_rpm), 0.25)
-		audioStreamPlayer.volume_db = linear_to_db((throttle_amount * 0.5) + 0.5)
+		audioStreamPlayer.volume_db = linear_to_db((throttle_amount * 0.5) + 0.5) - 35 # ear fix
 	else:
 		audioStreamPlayer.stream_paused = true
 
@@ -979,44 +986,13 @@ func process_stability():
 func process_network():
 	controller.broadcast();
 
+
 func set_idle():
 		local_velocity = Vector3.ZERO
 		previous_global_position = Vector3.ZERO
 		speed = 0.0
 		motor_rpm = 0.0
-		
-		#steering_amount = 0.0
-		#steering_exponent_amount = 0.0
-		#true_steering_amount = 0.0
-		#throttle_amount = 0.0
-		#brake_amount = 0.0
-		#clutch_amount = 0.0
-		#current_gear = 0
-		#requested_gear = 0
-		#torque_output = 0.0
-		#clutch_torque = 0.0
-		#max_clutch_torque = 0.0
-		#drive_axles_inertia = 0.0
-		#complete_shift_delta_time = 0.0
-		#last_shift_delta_time = 0.0
-		#average_drive_wheel_radius = 0.0
-		#current_torque_split = 0.0
-		#true_torque_split = 0.0
-		#brake_force = 0.0
-		#max_brake_force = 0.0
-		#handbrake_force = 0.0
-		#max_handbrake_force = 0.0
-		#is_braking = false
-		#motor_is_redline = false
-		#is_shifting = false
-		#is_up_shifting = false
-		#need_clutch = false
-		#tcs_active = false
-		#stability_active = false
-		#stability_yaw_torque = 0.0
-		#stability_torque_vector = Vector3.ZERO
-		#front_axle_position = Vector3.ZERO
-		#rear_axle_position = Vector3.ZERO
+		steering_amount = 0.0
 
 func manual_shift(count : int):
 	if not automatic_transmission:
