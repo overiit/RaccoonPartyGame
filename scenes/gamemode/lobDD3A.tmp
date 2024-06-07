@@ -63,5 +63,5 @@ script = ExtResource("5_g56wh")
 [node name="VehicleSpawner" type="Node3D" parent="." node_paths=PackedStringArray("entitySpawner")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.6122, 4.72873, 6.29702)
 script = ExtResource("6_dnvnj")
-entitySpawner = NodePath("../EntitySpawner")
 entity_to_spawn = "jeep"
+entitySpawner = NodePath("../EntitySpawner")

@@ -6,13 +6,13 @@ func _ready():
 
 func onPacket(sender: int, message: String, data: Dictionary):
 	super.onPacket(sender, message, data)
-	if sender == SteamLobbyManager.getHost():
+	if sender == SteamLobby.host_id:
 		if message == "mount" && data['entity_id'] == entity_id:
 			onMounted(data['steam_id'])
 		if message == "unmount" && data['steam_id'] == get_authority():
 			onUnmounted(data['steam_id'])
 
-	if SteamLobbyManager.isHost():
+	if SteamLobby.is_host():
 		if message == "unmount" && data['steam_id'] == get_authority() && sender == data['steam_id']:
 			_handleUnmount(data['steam_id'])
 
@@ -23,30 +23,30 @@ func onMounted(steam_id: int):
 func onUnmounted(steam_id: int):
 	unset_mount()
 
-func unmount(steam_id: int = SteamManager.STEAM_ID):
-	if SteamLobbyManager.isHost():
-		onUnmounted(SteamManager.STEAM_ID)
-		SteamLobbyManager.sendPacket(0, "unmount", {
-			"steam_id": SteamManager.STEAM_ID,
+func unmount(steam_id: int = SteamAccount.STEAM_ID):
+	if SteamLobby.is_host():
+		onUnmounted(SteamAccount.STEAM_ID)
+		SteamNetwork.sendPacket(0, "unmount", {
+			"steam_id": SteamAccount.STEAM_ID,
 			"entity_id": entity_id
 		})
 	else:
-		SteamLobbyManager.sendPacket(SteamLobbyManager.getHost(), "unmount", {
-			"steam_id": SteamManager.STEAM_ID,
+		SteamNetwork.sendPacket(SteamLobby.host_id, "unmount", {
+			"steam_id": SteamAccount.STEAM_ID,
 			"entity_id": entity_id
 		})
 
 func _handleMount(steam_id: int):
-	if SteamLobbyManager.isHost():
-		SteamLobbyManager.sendPacket(0, "mount", {
+	if SteamLobby.is_host():
+		SteamNetwork.sendPacket(0, "mount", {
 			"steam_id": steam_id,
 			"entity_id": entity_id,
 		})
 	onMounted(steam_id);
 	
 func _handleUnmount(steam_id: int):
-	if SteamLobbyManager.isHost():
-		SteamLobbyManager.sendPacket(0, "unmount", {
+	if SteamLobby.is_host():
+		SteamNetwork.sendPacket(0, "unmount", {
 			"steam_id": steam_id,
 			"entity_id": entity_id,
 		})
@@ -77,7 +77,7 @@ func is_mounted():
 	return get_authority() > 0
 
 func is_authority() -> bool:
-	return get_authority() == SteamManager.STEAM_ID
+	return get_authority() == SteamAccount.STEAM_ID
 	
 func get_authority() -> int:
 	if has_meta("steam_id"):

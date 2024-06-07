@@ -6,7 +6,7 @@ extends Node3D
 
 
 func _ready():
-	if SteamLobbyManager.isHost():
+	if SteamLobby.is_host():
 		Utils.lastVehileId += 1
 		entitySpawner.spawnEntity(Utils.lastVehileId, entity_to_spawn, self.position, self.rotation)
 	pass

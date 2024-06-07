@@ -13,15 +13,15 @@ config_version=5
 config/name="Raty"
 run/main_scene="res://scenes/ui/menu.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
-boot_splash/bg_color=Color(0.299547, 0.299547, 0.299547, 1)
+boot_splash/bg_color=Color(0.115548, 0.323654, 0.427619, 1)
 boot_splash/image="res://assets/RATY_PNG.png"
-boot_splash/fullsize=false
 config/icon="res://assets/RATY_ICON.png"
 
 [autoload]
 
-SteamManager="*res://scripts/steam/SteamManager.gd"
-SteamLobbyManager="*res://scripts/steam/SteamLobbyManager.gd"
+SteamAccount="*res://scripts/steam/SteamAccount.gd"
+SteamNetwork="*res://scripts/steam/SteamNetwork.gd"
+SteamLobby="*res://scripts/steam/SteamLobby.gd"
 GameState="*res://scripts/utils/GameState.gd"
 EntityManager="*res://scripts/utils/EntityManager.gd"
 InteractionManager="*res://scripts/utils/InteractionManager.gd"

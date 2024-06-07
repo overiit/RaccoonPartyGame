@@ -16,7 +16,7 @@ func onMounted(steam_id: int):
 		player.rotation.y = -player.visual_char.rotation.y + 180
 		player.onEntityMount(self)
 		
-		if steam_id == SteamManager.STEAM_ID:
+		if steam_id == SteamAccount.STEAM_ID:
 			vehicle.controller.camera.make_current()
 
 func onUnmounted(steam_id: int):
