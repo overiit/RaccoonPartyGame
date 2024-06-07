@@ -2,39 +2,40 @@
 
 [ext_resource type="PackedScene" uid="uid://1gfropwtqfbn" path="res://addons/GodotSky/GodotSky.tscn" id="1_c0ria"]
 [ext_resource type="Script" path="res://scripts/utils/EntitySpawner.gd" id="3_26xi0"]
-[ext_resource type="PackedScene" uid="uid://brsg0pg1alinp" path="res://models/maps/track.blend" id="4_0ohua"]
+[ext_resource type="PackedScene" uid="uid://da5vwkir88mwo" path="res://models/maps/#030 Track.blend" id="3_xxupf"]
 [ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_spawner.gd" id="5_m5nua"]
 [ext_resource type="Material" uid="uid://b3ri53ldiu7v" path="res://utils/default_material.tres" id="5_qbh46"]
 
 [node name="Race" type="Node3D"]
 
 [node name="GodotSky" parent="." instance=ExtResource("1_c0ria")]
-
-[node name="track" parent="." instance=ExtResource("4_0ohua")]
-
-[node name="Map" parent="track" index="0"]
-material_override = ExtResource("5_qbh46")
+cloudCoverage = 0.137
 
 [node name="EntitySpawner" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.82459, 0)
 script = ExtResource("3_26xi0")
 
+[node name="#030 Track" parent="." instance=ExtResource("3_xxupf")]
+
+[node name="Track" parent="#030 Track" index="0"]
+material_override = ExtResource("5_qbh46")
+
 [node name="VehicleSpawner" type="Node3D" parent="." node_paths=PackedStringArray("entitySpawner")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45558, 0.830462, 5.00014)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.06245, 0.830462, 5.79093)
 script = ExtResource("5_m5nua")
 entitySpawner = NodePath("../EntitySpawner")
 entity_to_spawn = "jeep"
 
 [node name="VehicleSpawner2" type="Node3D" parent="." node_paths=PackedStringArray("entitySpawner")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.38832, 0.830462, 7.30007)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.38832, 1.78285, 6.31194)
 script = ExtResource("5_m5nua")
 entitySpawner = NodePath("../EntitySpawner")
 entity_to_spawn = "sportscar"
 
 [node name="VehicleSpawner3" type="Node3D" parent="." node_paths=PackedStringArray("entitySpawner")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5141, 0.830462, 12.0798)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5141, 1.87467, 2.20426)
 script = ExtResource("5_m5nua")
 entitySpawner = NodePath("../EntitySpawner")
 entity_to_spawn = "sportscar"
 
-[editable path="track"]
+[editable path="#030 Track"]
