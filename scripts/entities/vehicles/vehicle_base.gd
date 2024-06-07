@@ -393,13 +393,14 @@ class Axle:
 
 func onEntityMove(steam_id: int, message: String, data: Dictionary):
 	if message == "entity_move":
-		if controller.vehicle_mount.entity_id == data['id']:
-			global_position = data['global_position']
-			global_transform = data['global_transform']
-			#print(data)
+		if steam_id == SteamLobby.host_id || controller.vehicle_mount.get_authority() == steam_id:
+			if controller.vehicle_mount.entity_id == data['id']:
+				global_position = data['global_position']
+				global_transform = data['global_transform']
+				#print(data)
 	
 func _ready():
-	SteamLobbyManager.onPacket.connect(onEntityMove)
+	SteamNetwork.onPacket.connect(onEntityMove)
 	audioStreamPlayer.autoplay = true;
 	audioStreamPlayer.volume_db = -24;
 	audioStreamPlayer.stream = stream;

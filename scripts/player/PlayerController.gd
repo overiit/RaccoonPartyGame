@@ -36,7 +36,7 @@ var gravity = 20
 var mounted_to : Mountable = null
 
 func is_authority() -> bool:
-	return get_authority() == SteamManager.STEAM_ID
+	return get_authority() == SteamAccount.STEAM_ID
 	
 func get_authority() -> int:
 	if has_meta("steam_id"):
@@ -44,9 +44,8 @@ func get_authority() -> int:
 	return 0
 
 func _ready():
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	camera.set_current(is_authority()) 
-	SteamLobbyManager.onPacket.connect(_onPacket)
+	camera.set_current(is_authority())
+	SteamNetwork.onPacket.connect(_onPacket)
 
 func _onPacket(steam_id: int, message: String, data: Dictionary):
 	if message == "pos":
@@ -168,7 +167,7 @@ func _process(delta):
 
 
 func broadcastPosition(steam_id: int = 0):
-	SteamLobbyManager.sendPacket(0, "pos", {
+	SteamNetwork.sendPacket(0, "pos", {
 		"x": position.x,
 		"y": position.y,
 		"z": position.z,

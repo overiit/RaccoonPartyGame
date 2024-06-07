@@ -19,7 +19,6 @@ enum SessionState {
 	END = 3,
 }
 
-# Global Game State
 var sessionState: SessionState = SessionState.NONE
 var mode = null
 var countdown: float = 0
@@ -27,18 +26,25 @@ var countdown: float = 0
 # Lobby
 var READY_PLAYERS: Array = [];
 
+signal onSessionStateChange()
+signal onModeChange()
+
+
 func _ready():
-	SteamLobbyManager.onLobbyCreated.connect(_onLobbyCreated)
-	SteamLobbyManager.onLobbyJoined.connect(_onLobbyJoined)
-	SteamLobbyManager.onLobbyUpdated.connect(_onLobbyUpdated)
-	SteamLobbyManager.onCountdownChange.connect(_onCountdownChange)
-	SteamLobbyManager.onPlayerReady.connect(_onPlayerReady)
-	SteamLobbyManager.onPlayerUnready.connect(_onPlayerUnready)
-	SteamLobbyManager.onPlayerLeft.connect(_onPlayerLeft)
+	SteamLobby.onLobbyCreated.connect(_onLobbyCreated)
+	SteamLobby.onLobbyJoined.connect(_onLobbyJoined)
+	SteamLobby.onLobbyUpdated.connect(_onLobbyUpdated)
+	SteamLobby.onLobbyReady.connect(_onLobbyReady)
+	SteamLobby.onLobbyLeft.connect(_onLobbyLeft)
+	
+	# SteamLobby.onCountdownChange.connect(_onCountdownChange)
+	# SteamLobby.onPlayerReady.connect(_onPlayerReady)
+	# SteamLobby.onPlayerUnready.connect(_onPlayerUnready)
+	SteamLobby.onPlayerLobbyLeft.connect(_onPlayerLeft)
 
 func _process(delta):
-	if SteamLobbyManager.LOBBY_ID > 0:
-		if SteamLobbyManager.isHost():
+	if SteamLobby.lobby_id > 0:
+		if SteamLobby.is_host():
 			hostGameLoop(delta)
 
 ############
@@ -71,12 +77,12 @@ func startRound():
 	_handleStateChange()
 
 func sendCountdown():
-	SteamLobbyManager.sendPacket(0, k_countdown, {
+	SteamNetwork.sendPacket(0, k_countdown, {
 		"time": countdown
 	})
 
 func hostGameLoop(delta):
-	var lobby_size = SteamLobbyManager.LOBBY_MEMBERS.size()
+	var lobby_size = SteamLobby.members.size()
 	var ready_size = READY_PLAYERS.size()
 	sendCountdown();
 	
@@ -100,27 +106,27 @@ func hostGameLoop(delta):
 ###########
 
 func toggleReady():
-	var isReady = READY_PLAYERS.has(SteamManager.STEAM_ID)
-	if SteamLobbyManager.isHost():
+	var isReady = READY_PLAYERS.has(SteamAccount.STEAM_ID)
+	if SteamLobby.is_host():
 		if !isReady:
-			_onPlayerReady(SteamManager.STEAM_ID)
+			_onPlayerReady(SteamAccount.STEAM_ID)
 		else:
-			_onPlayerUnready(SteamManager.STEAM_ID)
+			_onPlayerUnready(SteamAccount.STEAM_ID)
 	else:
 		if !isReady:
-			SteamLobbyManager.sendPacket(0, "ready", {})
+			SteamNetwork.sendPacket(0, "ready", {})
 		else:
-			SteamLobbyManager.sendPacket(0, "unready", {})
+			SteamNetwork.sendPacket(0, "unready", {})
 
-func backToLobby():
-	sessionState = SessionState.WAITING_FOR_PLAYERS
+func backToMenu():
+	sessionState = SessionState.NONE
 	mode = null
 	READY_PLAYERS.clear()
 	countdown = WARMUP_TIME
 	pushGameState()
 
 func isReady() -> bool:
-	return READY_PLAYERS.has(SteamManager.STEAM_ID)
+	return READY_PLAYERS.has(SteamAccount.STEAM_ID)
 
 ###########
 # Events
@@ -133,8 +139,11 @@ func _onLobbyJoined(lobby_id: int):
 	# on join trigger fetching the state
 	_onLobbyUpdated(lobby_id)
 
+func _onLobbyLeft(lobby_id: int):
+	backToMenu()
+
 func _onPlayerReady(steam_id: int):
-	if !SteamLobbyManager.isHost():
+	if !SteamLobby.is_host():
 		return
 
 	if sessionState == SessionState.WAITING_FOR_PLAYERS:
@@ -143,18 +152,24 @@ func _onPlayerReady(steam_id: int):
 			setState(k_ready_players, READY_PLAYERS)
 
 func _onPlayerUnready(steam_id: int):
-	if SteamLobbyManager.isHost():
+	if SteamLobby.is_host():
 		if GameState.READY_PLAYERS.has(steam_id):
 			GameState.READY_PLAYERS.erase(steam_id)
 			setState(k_ready_players, READY_PLAYERS)
 
 func _onPlayerLeft(steam_id: int):
-	if SteamLobbyManager.isHost():
+	if SteamLobby.is_host():
 		if GameState.READY_PLAYERS.has(steam_id):
 			GameState.READY_PLAYERS.erase(steam_id)
 			setState(k_ready_players, READY_PLAYERS)
 
+func _onLobbyReady(_lobby_id: int):
+	_onLobbyUpdated(_lobby_id)
+	
+
 func _onLobbyUpdated(_lobby_id: int):
+	if !SteamLobby.is_ready:
+		return
 	var _sessionState = getData(k_session_state) as SessionState
 	var _mode = getData(k_gamemode)
 	var _readyPlayers = getData(k_ready_players);
@@ -189,7 +204,7 @@ func pushGameState():
 	sendCountdown()
 
 func setState(key: String, data: Variant):
-	Steam.setLobbyData(SteamLobbyManager.LOBBY_ID, key, var_to_str(data))
+	Steam.setLobbyData(SteamLobby.lobby_id, key, var_to_str(data))
 
 func getData(key: String):
-	return str_to_var(Steam.getLobbyData(SteamLobbyManager.LOBBY_ID, key));
+	return str_to_var(Steam.getLobbyData(SteamLobby.lobby_id, key));

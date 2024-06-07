@@ -71,7 +71,8 @@ orientation = 1
 [node name="MenuScene" type="Node3D"]
 
 [node name="GodotSky" parent="." instance=ExtResource("1_bo2b7")]
-timeOfDay = 1200.0
+timeOfDay = 1762.32
+cloudCoverage = 0.0
 
 [node name="scene" type="Node" parent="."]
 

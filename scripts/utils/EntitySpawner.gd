@@ -9,30 +9,31 @@ extends Node3D
 }
 
 func _ready():
-	spawnPlayer(SteamManager.STEAM_ID)
+	spawnPlayer(SteamAccount.STEAM_ID)
 	onJoin()
-	SteamLobbyManager.onPlayerJoined.connect(spawnPlayer)
-	SteamLobbyManager.onPlayerLeft.connect(removePlayer)
+	SteamLobby.onPlayerConnected.connect(spawnPlayer)
+	SteamLobby.onPlayerLobbyLeft.connect(removePlayer)
 
-	SteamLobbyManager.onPacket.connect(_onPacket)
-	if SteamLobbyManager.isHost():
+	SteamNetwork.onPacket.connect(_onPacket)
+	if SteamLobby.is_host():
 		return
 	else:
-		SteamLobbyManager.sendPacket(SteamLobbyManager.getHost(), "request_entities", {})
+		SteamNetwork.sendPacket(SteamLobby.host_id, "request_entities", {})
 	pass
 	
 func _exit_tree():
 	EntityManager.players.clear()
 	EntityManager.entities.clear()
+	
 
 ######
 # Players
 ######
 
 func onJoin():
-	for MEMBERS in SteamLobbyManager.LOBBY_MEMBERS:
+	for MEMBERS in SteamLobby.members:
 		var steam_id: int = MEMBERS['steam_id']
-		if steam_id != SteamManager.STEAM_ID:
+		if steam_id != SteamAccount.STEAM_ID:
 			spawnPlayer(steam_id)
 
 func spawnPlayer(id: int):
@@ -47,7 +48,6 @@ func spawnPlayer(id: int):
 	
 func removePlayer(id: int):
 	if not EntityManager.players.has(id):
-		print('Player not in list')
 		return
 	remove_child(EntityManager.players[id])
 	EntityManager.players[id].queue_free()
@@ -60,13 +60,13 @@ func removePlayer(id: int):
 
 func _onPacket(sender: int, message: String, data: Dictionary):
 	# If I am the host, handle the message
-	if SteamLobbyManager.isHost():
+	if SteamLobby.is_host():
 		if message == "request_entities":
 			notifyEntities(sender)
 		return
 	else:
 		# if sender is not the host, ignore the message
-		if sender != SteamLobbyManager.getHost():
+		if sender != SteamLobby.host_id:
 			return 
 		
 		if message == "entities":
@@ -76,7 +76,7 @@ func notifyEntities(steam_id: int):
 	var data = {
 		"entities": EntityManager.entities
 	}
-	SteamLobbyManager.sendPacket(steam_id, "entities", data)
+	SteamNetwork.sendPacket(steam_id, "entities", data)
 	pass
 
 func receivedEntities(_data: Dictionary):
@@ -114,7 +114,7 @@ func spawnEntity(id: int, type: String, _position: Vector3, _rotation: Vector3):
 	add_child(entity)
 	
 
-	if SteamLobbyManager.isHost():
+	if SteamLobby.is_host():
 		notifyEntities(0)
 		print(EntityManager.entities)
 

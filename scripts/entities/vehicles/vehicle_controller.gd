@@ -23,7 +23,7 @@ func _ready():
 			vehicle_mount = child
 
 	#if !is_authority():
-		#SteamLobbyManager.onPlayerMove.connect(_onPlayerMove)
+		#SteamLobby.onPlayerMove.connect(_onPlayerMove)
 
 func _physics_process(delta):
 	if vehicle_mount == null || !vehicle_mount.is_authority():
@@ -40,10 +40,13 @@ func _physics_process(delta):
 		vehicle_node.throttle_input = Input.get_action_strength("down")
 
 func broadcast():
-	if (
-		vehicle_mount == null &&
-		!SteamLobbyManager.isHost()
-	) || vehicle_mount.get_authority() > 0 && !vehicle_mount.is_authority():
+	var broadcast = false
+	if vehicle_mount.is_authority():
+		broadcast = true
+	elif vehicle_mount.get_authority() == 0 && SteamLobby.is_host():
+		broadcast = true
+		
+	if !broadcast:
 		return
 	
 	var datapacket = {
@@ -67,4 +70,4 @@ func broadcast():
 
 	#print(datapacket)
 
-	SteamLobbyManager.sendPacket(0, "entity_move", datapacket)
+	SteamNetwork.sendPacket(0, "entity_move", datapacket)

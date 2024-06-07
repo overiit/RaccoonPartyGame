@@ -8,13 +8,13 @@ extends Entity
 func _ready():
 	super._ready()
 	InteractionManager.add_interactable(self)
-	SteamLobbyManager.onPacket.connect(onPacket)
+	SteamNetwork.onPacket.connect(onPacket)
 
 func _exit_tree():	
-	InteractionManager.interactables.erase(interactable)
+	InteractionManager.interactables.erase(self)
 
 func onPacket(steam_id: int, message: String, data: Dictionary):
-	if SteamLobbyManager.isHost():
+	if SteamLobby.is_host():
 		if message == "interact":
 			if data['entity_id'] == entity_id:
 				_onInteract(steam_id)
@@ -24,16 +24,16 @@ func onInteract(steam_id: int):
 	pass
 
 func _onInteract(steam_id: int):
-	if !SteamLobbyManager.isHost():
+	if !SteamLobby.is_host():
 		return
 	onInteract(steam_id)
 
 func interact():
-	if !SteamLobbyManager.isHost():
-		SteamLobbyManager.sendPacket(SteamLobbyManager.getHost(), "interact", {
+	if !SteamLobby.is_host():
+		SteamNetwork.sendPacket(SteamLobby.host_id, "interact", {
 			"entity_id": entity_id,
 		})
 		return
 	else:
-		onInteract(SteamManager.STEAM_ID)
+		onInteract(SteamAccount.STEAM_ID)
 	pass
