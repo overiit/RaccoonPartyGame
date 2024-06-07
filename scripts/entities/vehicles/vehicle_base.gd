@@ -391,14 +391,6 @@ class Axle:
 			slip = maxf(slip, wheel.slip_vector.y)
 		return slip
 
-func onEntityMove(steam_id: int, message: String, data: Dictionary):
-	if message == "entity_move":
-		if steam_id == SteamLobby.host_id || controller.vehicle_mount.get_authority() == steam_id:
-			if controller.vehicle_mount.entity_id == data['id']:
-				global_position = data['global_position']
-				global_transform = data['global_transform']
-				#print(data)
-	
 func _ready():
 	SteamNetwork.onPacket.connect(onEntityMove)
 	audioStreamPlayer.autoplay = true;
@@ -601,6 +593,54 @@ func initialize():
 	calculate_brake_force()
 	
 	is_ready = true
+
+var current_networked_position: Vector3 = Vector3.ZERO
+var next_networked_position: Vector3 = Vector3.ZERO
+
+var current_networked_transform: Transform3D = Transform3D.IDENTITY
+var next_networked_transform: Transform3D = Transform3D.IDENTITY
+
+var current_networked_velocity: Vector3 = Vector3.ZERO
+var next_networked_velocity: Vector3 = Vector3.ZERO
+
+var current_networked_angular_velocity: Vector3 = Vector3.ZERO
+var next_networked_angular_velocity: Vector3 = Vector3.ZERO
+
+#func onEntityMove(steam_id: int, message: String, data: Dictionary):
+	#if message == "entity_move":
+		## Trust source
+		#if steam_id == SteamLobby.host_id || controller.vehicle_mount.get_authority() == steam_id:
+			#if controller.vehicle_mount.entity_id == data['id']:
+				#next_networked_position = data['global_position'];
+				##global_position.lerp(, 64)
+				#global_transform = data['global_transform']
+
+func onEntityMove(steam_id: int, message: String, data: Dictionary):
+	print('entity_move')
+	if message == "entity_move":
+		# Trust source
+		if steam_id == SteamLobby.host_id || controller.vehicle_mount.get_authority() == steam_id:
+			if controller.vehicle_mount.entity_id == data['id']:
+				next_networked_position = data['global_position']
+				next_networked_transform = data['global_transform']
+				next_networked_velocity = data['velocity']
+				next_networked_angular_velocity = data['angular_velocity']
+
+
+func _process(delta):
+	if !SteamLobby.is_host():
+		current_networked_position = current_networked_position.lerp(next_networked_position, 0.1)
+		global_position = current_networked_position
+
+		current_networked_transform = current_networked_transform.interpolate_with(next_networked_transform, 0.1)
+		global_transform = current_networked_transform
+
+		current_networked_velocity = current_networked_velocity.lerp(next_networked_velocity, 0.1)
+		linear_velocity = current_networked_velocity
+
+		current_networked_angular_velocity = current_networked_angular_velocity.lerp(next_networked_angular_velocity, 0.1)
+		angular_velocity = current_networked_angular_velocity
+		
 
 func _physics_process(delta):
 	if not is_ready:
@@ -986,7 +1026,6 @@ func process_stability():
 
 func process_network():
 	controller.broadcast();
-
 
 func set_idle():
 		local_velocity = Vector3.ZERO

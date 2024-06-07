@@ -40,6 +40,7 @@ func spawnPlayer(id: int):
 	if EntityManager.players.has(id):
 		print("Warning: Failed spawning "  + str(id) + " as they already exist")
 		return
+	print("spawn player: " + str(id))
 	var player = playerScene.instantiate()
 	player.set_meta("steam_id", id)
 	EntityManager.players[id] = player

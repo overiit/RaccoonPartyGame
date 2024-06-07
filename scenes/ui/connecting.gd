@@ -26,4 +26,3 @@ func _process(delta):
 		connectionStatus.text = "Connecting to players... (" + str(connected) + " / " + str(members.size() - 1) + ")"
 		return
 	connectionStatus.text = "Loading world... (0 / 1)"
-	pass

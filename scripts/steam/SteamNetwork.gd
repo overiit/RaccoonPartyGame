@@ -50,8 +50,7 @@ func _process(_delta):
 	if SteamLobby.lobby_id > 0:
 		_readP2PPackets()
 
-func sendPacket(target: int, message: String, packet_data: Dictionary = {}, queue: bool = false) -> void:
-	var SEND_TYPE: int = Steam.P2P_SEND_RELIABLE
+func sendPacket(target: int, message: String, packet_data: Dictionary = {}, queue: bool = false, send_type: int = Steam.P2P_SEND_RELIABLE) -> void:
 	var DATA: PackedByteArray = []
 	
 	var COMPRESSED_DATA: PackedByteArray = var_to_bytes([message, packet_data]).compress(FileAccess.COMPRESSION_GZIP)
@@ -63,10 +62,10 @@ func sendPacket(target: int, message: String, packet_data: Dictionary = {}, queu
 				var steam_id = member['steam_id']
 				if steam_id != SteamAccount.STEAM_ID:
 					if isP2PConnected(steam_id) or queue:
-						Steam.sendP2PPacket(steam_id, DATA, SEND_TYPE, CHANNEL)
+						Steam.sendP2PPacket(steam_id, DATA, send_type, CHANNEL)
 	else:
 		if isP2PConnected(target) or queue:
-			Steam.sendP2PPacket(target, DATA, SEND_TYPE, CHANNEL)
+			Steam.sendP2PPacket(target, DATA, send_type, CHANNEL)
 
 func _readP2PPackets() -> void:
 	var PACKET_SIZE: int = Steam.getAvailableP2PPacketSize(CHANNEL)
@@ -109,7 +108,7 @@ func _onSessionRequest(remote_id: int) -> void:
 	}
 	
 	Steam.acceptP2PSessionWithUser(remote_id)
-
+	
 	sendHandshake(remote_id, HandshakeState.INITIAL)
 
 func sendHandshake(target_id: int = 0, state: HandshakeState = HandshakeState.INITIAL) -> void:
@@ -128,9 +127,7 @@ func _onPacket(steam_id: int, message: String, data: Dictionary) -> void:
 			newHandshakeState = HandshakeState.RESPONSE
 		elif state == HandshakeState.RESPONSE:
 			newHandshakeState = HandshakeState.CONFIRMED
-		
-			
-		
+
 		if _p2pConnections.has(steam_id):
 			_p2pConnections[steam_id]["handshake"] = newHandshakeState
 		else:

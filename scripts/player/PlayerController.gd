@@ -19,6 +19,9 @@ const WALK_SPEED = 4.6
 const SPRINT_SPEED = 8.0
 var speed = WALK_SPEED
 
+var current_networked_position: Vector3 = Vector3.ZERO
+var next_networked_position: Vector3 = Vector3.ZERO
+
 enum States {IDLE, RUN, SPRINT, JUMP, FALL, DROP_RUN_ROLL} 
 var state = States.IDLE
 
@@ -72,13 +75,15 @@ func onEntityUnmount():
 	axis_lock_linear_x = false
 	axis_lock_linear_y = false
 	axis_lock_linear_z = false
+	rotation = Vector3.ZERO
 	mounted_to = null
 	if is_authority():
 		camera.set_current(true)
 
 func onPlayerMove(steam_id: int, pos: Vector3, rot: Vector3, animation: String):
 	if get_authority() == steam_id:
-		position = pos
+		next_networked_position = pos
+		#position = pos
 		visual_char.rotation.y = rot.y
 		if animation.length() > 0:
 			anim_player.play(animation)
@@ -88,7 +93,6 @@ func _unhandled_input(event):
 		return
 	if event is InputEventMouseMotion:
 		repositionCamera(event.relative.x, event.relative.y);
-		
 
 func repositionCamera(relativeX, relativeY):
 	var x_rot = camera_mount.rotation_degrees.x - relativeY * sens_vertical
@@ -102,12 +106,19 @@ func repositionCamera(relativeX, relativeY):
 	var query = PhysicsRayQueryParameters3D.create(camera_mount.global_position, camera.global_position)
 	var result = space_state.intersect_ray(query);
 
-	
 	if result.has("position"):
 		camera.global_position = result["position"]
-	
+
 	camera.look_at(camera_mount.global_transform.origin)	
 
+func _process(delta):
+	if !is_authority():
+		current_networked_position = current_networked_position.lerp(next_networked_position, 0.1)
+		position = current_networked_position
+		return
+	# TODO limit to 60 ticks even if game is 144 ticks
+	broadcastPosition();
+	
 func _physics_process(delta):
 	if !is_authority():
 		return
@@ -159,13 +170,6 @@ func _physics_process(delta):
 	play_animation()
 	move_and_slide()
 
-func _process(delta):
-	if !is_authority():
-		return
-	# TODO limit to 60 ticks even if game is 144 ticks
-	broadcastPosition();
-
-
 func broadcastPosition(steam_id: int = 0):
 	SteamNetwork.sendPacket(0, "pos", {
 		"x": position.x,
@@ -173,7 +177,7 @@ func broadcastPosition(steam_id: int = 0):
 		"z": position.z,
 		"rotY": visual_char.rotation.y,
 		"animation": anim_player.current_animation,
-	})
+	}, false, Steam.P2P_SEND_UNRELIABLE_NO_DELAY)
 
 func play_animation():
 	match state:

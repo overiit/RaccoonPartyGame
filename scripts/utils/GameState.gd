@@ -38,8 +38,8 @@ func _ready():
 	SteamLobby.onLobbyLeft.connect(_onLobbyLeft)
 	
 	# SteamLobby.onCountdownChange.connect(_onCountdownChange)
-	# SteamLobby.onPlayerReady.connect(_onPlayerReady)
-	# SteamLobby.onPlayerUnready.connect(_onPlayerUnready)
+	SteamLobby.onPlayerReady.connect(_onPlayerReady)
+	SteamLobby.onPlayerUnready.connect(_onPlayerUnready)
 	SteamLobby.onPlayerLobbyLeft.connect(_onPlayerLeft)
 
 func _process(delta):
@@ -84,7 +84,6 @@ func sendCountdown():
 func hostGameLoop(delta):
 	var lobby_size = SteamLobby.members.size()
 	var ready_size = READY_PLAYERS.size()
-	sendCountdown();
 	
 	if sessionState == SessionState.WAITING_FOR_PLAYERS:
 		if lobby_size <= 0: # change this so 1 person cant play alone
@@ -95,6 +94,7 @@ func hostGameLoop(delta):
 		else:
 			# reset to max timer
 			countdown = LOBBY_TIME
+		sendCountdown();
 		if countdown <= 0:
 			startRound()
 	elif sessionState == SessionState.INGAME:

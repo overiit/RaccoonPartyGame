@@ -29,11 +29,11 @@ signal onPlayerLobbyLeft(steam_id: int)
 signal onPlayerKicked(steam_id: int, ban: bool)
 
 # # player lobby
-# signal onPlayerReady(steam_id: int)
-# signal onPlayerUnready(steam_id: int)
+signal onPlayerReady(steam_id: int)
+signal onPlayerUnready(steam_id: int)
 
 # # generic game
-# signal onCountdownChange(time: float)
+signal onCountdownChange(time: float)
 
 func _ready():
 	Steam.lobby_created.connect(_onLobbyCreated)
@@ -41,6 +41,7 @@ func _ready():
 	Steam.lobby_chat_update.connect(_onLobbyChatUpdate)
 	
 	SteamNetwork.onP2PConnected.connect(_onP2PConnected)
+	SteamNetwork.onPacket.connect(_handlePacket)
 
 	Steam.lobby_data_update.connect(_onLobbyDataUpdate)
 	Steam.join_requested.connect(_onLobbyInvite)
@@ -123,7 +124,7 @@ func _onLobbyCreated(_connect: int, _lobby_id: int) -> void:
 		Steam.setLobbyJoinable(lobby_id, true)
 		
 		# Allow P2P connections to fallback to being relayed through Steam if needed
-		Steam.allowP2PPacketRelay(true)
+		Steam.allowP2PPacketRelay(false)
 		
 		is_ready = true
 		onLobbyReady.emit(lobby_id)
@@ -290,21 +291,18 @@ func _leave_Lobby() -> void:
 		members.clear()
 
 	
-# func _handlePacket(steam_id: int, message: String, data: Dictionary):
-# 	if message == "handshake":
-# 		print("handshake from: " + str(steam_id));
-# 		SteamLobby.onPlayerJoined.emit(steam_id)
-# 	elif message == "ready":
-# 		print("Ready from: " + str(steam_id))
-# 		onPlayerReady.emit(steam_id)
-# 	elif message == "unready":
-# 		print("Unready from: " + str(steam_id))
-# 		onPlayerUnready.emit(steam_id)
-# 	elif message == "countdown":
-# 		onCountdownChange.emit(data['time'])
-# 	elif message == 'pos':
-# 		pass
-# 	elif message == "entity_move":
-# 		pass
-# 	else:
-# 		print("Packet " + message + ": "+str(data))
+func _handlePacket(steam_id: int, message: String, data: Dictionary):
+	if message == "ready":
+		print("Ready from: " + str(steam_id))
+		onPlayerReady.emit(steam_id)
+	elif message == "unready":
+		print("Unready from: " + str(steam_id))
+		onPlayerUnready.emit(steam_id)
+	elif message == "countdown":
+		onCountdownChange.emit(data['time'])
+	elif message == 'pos':
+		pass
+	elif message == "entity_move":
+		pass
+	else:
+		print("Packet " + message + ": "+str(data))
