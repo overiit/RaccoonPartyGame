@@ -16,5 +16,5 @@ sdfgi_min_cell_size = 1.95313
 fog_light_energy = 0.02
 fog_density = 0.0046
 volumetric_fog_enabled = true
-volumetric_fog_density = 0.004224
+volumetric_fog_density = -0.024
 volumetric_fog_temporal_reprojection_enabled = false
