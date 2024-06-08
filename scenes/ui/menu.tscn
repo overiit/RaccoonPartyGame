@@ -10,38 +10,39 @@
 [ext_resource type="Shader" path="res://shaders/water.gdshader" id="5_tetet"]
 [ext_resource type="PackedScene" uid="uid://dwynhjg28raj4" path="res://models/terrain/mountain_range.blend" id="6_os2ud"]
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_kaj17"]
-noise_type = 2
-frequency = 0.0383
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_qogxe"]
 
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_nxxhn"]
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_jx0hi"]
 seamless = true
+seamless_blend_skirt = 0.0
 as_normal_map = true
-bump_strength = 0.0
-noise = SubResource("FastNoiseLite_kaj17")
+bump_strength = 1.9
+noise = SubResource("FastNoiseLite_qogxe")
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_cuq33"]
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_suidh"]
 seamless = true
 as_normal_map = true
-bump_strength = 4.0
 noise = SubResource("FastNoiseLite_cuq33")
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_kp7tp"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_br6k2"]
+noise_type = 2
+frequency = 0.0079
 
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_wl5et"]
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_upxvw"]
 seamless = true
-noise = SubResource("FastNoiseLite_kp7tp")
+seamless_blend_skirt = 0.008
+noise = SubResource("FastNoiseLite_br6k2")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_u2w2b"]
 render_priority = 0
 shader = ExtResource("5_tetet")
 shader_parameter/albedo = Color(0.0647401, 0.729448, 1, 1)
 shader_parameter/albedo2 = Color(0, 0.508735, 0.889617, 1)
-shader_parameter/metallic = 0.054
-shader_parameter/roughness = 0.02
-shader_parameter/wave_speed = 1.65
+shader_parameter/metallic = 0.0
+shader_parameter/roughness = 0.373
+shader_parameter/wave_speed = 0.93
 shader_parameter/wave_height = 0.1
 shader_parameter/wave_direction = Vector2(2, 0)
 shader_parameter/wave_direction2 = Vector2(0, 1)
@@ -57,15 +58,15 @@ shader_parameter/near = 1.0
 shader_parameter/far = 25.0
 shader_parameter/edge_color = Color(1, 1, 1, 1)
 shader_parameter/useGlobalPosition = true
-shader_parameter/wave = SubResource("NoiseTexture2D_wl5et")
-shader_parameter/texture_normal = SubResource("NoiseTexture2D_nxxhn")
+shader_parameter/wave = SubResource("NoiseTexture2D_upxvw")
+shader_parameter/texture_normal = SubResource("NoiseTexture2D_jx0hi")
 shader_parameter/texture_normal2 = SubResource("NoiseTexture2D_suidh")
 
 [sub_resource type="QuadMesh" id="QuadMesh_q1kdl"]
 material = SubResource("ShaderMaterial_u2w2b")
-size = Vector2(300, 300)
-subdivide_width = 200
-subdivide_depth = 200
+size = Vector2(150, 150)
+subdivide_width = 900
+subdivide_depth = 900
 orientation = 1
 
 [node name="MenuScene" type="Node3D"]
@@ -196,7 +197,7 @@ material_override = ExtResource("3_xu37o")
 material_override = ExtResource("3_xu37o")
 
 [node name="Water" type="MeshInstance3D" parent="scene"]
-transform = Transform3D(0.793523, -0.000145833, -0.60854, 0, 1, -0.000239644, 0.60854, 0.000190163, 0.793523, -16.6401, 0, -116.499)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.6401, 0, -64.6564)
 mesh = SubResource("QuadMesh_q1kdl")
 
 [node name="mountain_range" parent="scene" instance=ExtResource("6_os2ud")]

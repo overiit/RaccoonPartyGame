@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://b7x8gx0qlua6j"]
+[gd_scene load_steps=8 format=3 uid="uid://b7x8gx0qlua6j"]
 
 [ext_resource type="Script" path="res://scripts/GameLobby.gd" id="1_g738h"]
 [ext_resource type="PackedScene" uid="uid://1gfropwtqfbn" path="res://addons/GodotSky/GodotSky.tscn" id="2_pgr8u"]
 [ext_resource type="PackedScene" uid="uid://tu1hyuymiywq" path="res://models/maps/lobby.blend" id="2_v24rj"]
+[ext_resource type="Material" uid="uid://b3ri53ldiu7v" path="res://utils/default_material.tres" id="4_qsyja"]
 [ext_resource type="Script" path="res://scripts/utils/EntitySpawner.gd" id="5_g56wh"]
 [ext_resource type="Script" path="res://scripts/debug.gd" id="5_o0ob8"]
 [ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_spawner.gd" id="6_dnvnj"]
@@ -15,6 +16,12 @@ timeOfDay = 1400.0
 cloudCoverage = 0.0
 
 [node name="lobby" parent="." instance=ExtResource("2_v24rj")]
+
+[node name="Lobby" parent="lobby" index="0"]
+material_override = ExtResource("4_qsyja")
+
+[node name="Guitar2" parent="lobby" index="13"]
+material_override = ExtResource("4_qsyja")
 
 [node name="Canvas" type="CanvasLayer" parent="."]
 
@@ -65,3 +72,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.6122, 4.72873, 6.29702)
 script = ExtResource("6_dnvnj")
 entitySpawner = NodePath("../EntitySpawner")
 entity_to_spawn = "jeep"
+
+[editable path="lobby"]
