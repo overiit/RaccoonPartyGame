@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://c2bm3ti11cdw5"
-path="res://.godot/imported/raccoony2.blend-e4cc1a90652ff262612e06dd9667e96e.scn"
+uid="uid://dhbddyqu2iuc5"
+path="res://.godot/imported/raccoony222.blend-fee73619dd6e3a9fc3d1927803b83b96.scn"
 
 [deps]
 
-source_file="res://models/characters/raccoony2.blend"
-dest_files=["res://.godot/imported/raccoony2.blend-e4cc1a90652ff262612e06dd9667e96e.scn"]
+source_file="res://models/characters/raccoony222.blend"
+dest_files=["res://.godot/imported/raccoony222.blend-fee73619dd6e3a9fc3d1927803b83b96.scn"]
 
 [params]
 
