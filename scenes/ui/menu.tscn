@@ -4,8 +4,8 @@
 [ext_resource type="Script" path="res://scripts/LobbyMenu.gd" id="1_ny332"]
 [ext_resource type="FontFile" uid="uid://qt3ysfxx71d1" path="res://utils/fonts/Montserrat-ExtraBold.ttf" id="1_ycbq4"]
 [ext_resource type="PackedScene" uid="uid://ctmgsj5d8fc3b" path="res://models/ocean/raft.blend" id="2_4uok2"]
-[ext_resource type="PackedScene" uid="uid://b08h1wjm624o8" path="res://models/characters/raccoony.blend" id="2_rgn73"]
-[ext_resource type="Script" path="res://scripts/cinematic/CheeringLoop.gd" id="3_bhbht"]
+[ext_resource type="PackedScene" uid="uid://b08h1wjm624o8" path="res://models/characters/raccoony.blend" id="2_udibb"]
+[ext_resource type="Script" path="res://scripts/cinematic/CheeringLoop.gd" id="3_4v0vw"]
 [ext_resource type="Material" uid="uid://b3ri53ldiu7v" path="res://utils/default_material.tres" id="3_xu37o"]
 [ext_resource type="Shader" path="res://shaders/water.gdshader" id="5_tetet"]
 [ext_resource type="PackedScene" uid="uid://dwynhjg28raj4" path="res://models/terrain/mountain_range.blend" id="6_os2ud"]
@@ -71,7 +71,6 @@ orientation = 1
 [node name="MenuScene" type="Node3D"]
 
 [node name="GodotSky" parent="." instance=ExtResource("1_bo2b7")]
-timeOfDay = 1475.16
 cloudCoverage = 0.0
 
 [node name="scene" type="Node" parent="."]
@@ -80,8 +79,8 @@ cloudCoverage = 0.0
 transform = Transform3D(1, 0, 0, 0, 0.99863, -0.052336, 0, 0.052336, 0.99863, 0, 1.019, 8.651)
 fov = 23.9
 
-[node name="raccoony" parent="scene" instance=ExtResource("2_rgn73")]
-transform = Transform3D(0.997314, 0.0390464, -0.0619719, -0.0388801, 0.999236, 0.00388873, 0.0620767, -0.00146877, 0.99807, 1.88043, 0.104359, -0.76446)
+[node name="raccoony" parent="scene" instance=ExtResource("2_udibb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.81091, 0.112413, -0.801295)
 
 [node name="Skeleton3D" parent="scene/raccoony/Armature" index="0"]
 bones/0/position = Vector3(-0.0122665, 0.427707, -0.187273)
@@ -92,35 +91,55 @@ bones/3/rotation = Quaternion(0.00736785, -0.00997279, -0.0194065, 0.999735)
 bones/4/rotation = Quaternion(0.175585, -0.00564336, 0.0241546, 0.984152)
 bones/5/rotation = Quaternion(0.0177653, -0.00451189, 0.0123384, 0.999756)
 bones/7/rotation = Quaternion(-0.572439, -0.435804, 0.288886, -0.631612)
+bones/7/scale = Vector3(1, 1, 1)
 bones/8/rotation = Quaternion(-0.153052, -0.363581, 0.426037, 0.814172)
-bones/9/rotation = Quaternion(6.20417e-05, -0.000398274, 0.194257, 0.980951)
+bones/9/rotation = Quaternion(6.20424e-05, -0.000398273, 0.194257, 0.980951)
+bones/9/scale = Vector3(1, 1, 1)
 bones/10/rotation = Quaternion(-0.12957, -0.412718, 0.002079, 0.901594)
 bones/11/rotation = Quaternion(0.156968, 0.0390046, 0.249856, 0.954679)
+bones/11/scale = Vector3(1, 1, 1)
 bones/12/rotation = Quaternion(0.0477005, 0.106775, -0.699576, 0.704923)
-bones/13/rotation = Quaternion(0.000925461, 0.0610778, 0.186269, 0.980598)
+bones/13/rotation = Quaternion(0.000925462, 0.0610778, 0.186269, 0.980598)
+bones/14/rotation = Quaternion(0.0335845, 0.168989, 0.00424528, 0.985037)
 bones/15/rotation = Quaternion(0.376882, -0.0912515, -0.451813, 0.803429)
-bones/16/rotation = Quaternion(0.426672, 0.0505439, -0.734382, 0.525434)
+bones/16/rotation = Quaternion(0.426672, 0.0505439, -0.734382, 0.525433)
 bones/17/rotation = Quaternion(0.229871, 0.00675084, -0.401968, 0.886305)
-bones/19/rotation = Quaternion(0.675419, -0.349663, 0.360973, 0.53967)
+bones/18/rotation = Quaternion(0.0906996, 0.764843, 0.277743, 0.57415)
+bones/18/scale = Vector3(1, 1, 1)
+bones/19/rotation = Quaternion(0.675419, -0.349662, 0.360972, 0.53967)
 bones/20/rotation = Quaternion(-0.334954, 0.266619, -0.224636, 0.875362)
-bones/21/rotation = Quaternion(-0.000651857, 9.58277e-06, -0.143705, 0.98962)
+bones/21/rotation = Quaternion(-0.000651855, 9.58284e-06, -0.143705, 0.98962)
 bones/22/rotation = Quaternion(0.177733, 0.944596, -0.218262, 0.16885)
 bones/23/rotation = Quaternion(0.237361, -0.142053, 0.215397, 0.936528)
+bones/23/scale = Vector3(1, 1, 1)
 bones/24/rotation = Quaternion(-0.382438, -0.141381, 0.254255, 0.876987)
 bones/25/rotation = Quaternion(-0.171737, -0.0652939, 0.151728, 0.971196)
+bones/26/rotation = Quaternion(8.68554e-06, -0.00243234, -0.000465552, 0.999997)
+bones/26/scale = Vector3(1, 1, 1)
 bones/27/rotation = Quaternion(-0.104937, 0.0128438, 0.792417, 0.600748)
+bones/27/scale = Vector3(1, 1, 1)
 bones/28/rotation = Quaternion(0.795319, -0.360891, 0.04953, -0.484534)
+bones/28/scale = Vector3(1, 1, 1)
 bones/29/rotation = Quaternion(0.322185, -0.847494, 0.320131, 0.274712)
+bones/29/scale = Vector3(1, 1, 1)
+bones/30/rotation = Quaternion(-0.00105835, 0.00640304, 0.154315, 0.988)
 bones/31/rotation = Quaternion(0.0976717, -0.022784, 0.977958, -0.18314)
-bones/32/rotation = Quaternion(-0.518236, -0.1414, 0.00845776, 0.843425)
+bones/31/scale = Vector3(0.999999, 1, 1)
+bones/32/rotation = Quaternion(-0.518236, -0.1414, 0.00845775, 0.843425)
 bones/33/rotation = Quaternion(0.789338, 0.125796, -0.186444, 0.571279)
 bones/34/rotation = Quaternion(0.252736, 0.235968, -0.0636928, 0.936155)
 bones/36/rotation = Quaternion(-0.0693156, -0.0361733, 0.993362, 0.0843732)
+bones/36/scale = Vector3(0.999998, 1, 0.999998)
 bones/37/rotation = Quaternion(-0.477288, 0.18229, -0.0102971, 0.85957)
 bones/38/rotation = Quaternion(0.770628, -0.132508, 0.167454, 0.600444)
+bones/38/scale = Vector3(1, 1, 1)
+bones/39/scale = Vector3(1, 1, 1)
+
+[node name="Cube" parent="scene/raccoony/Armature/Skeleton3D" index="0"]
+material_override = ExtResource("3_xu37o")
 
 [node name="AnimationPlayer" parent="scene/raccoony" index="1"]
-script = ExtResource("3_bhbht")
+script = ExtResource("3_4v0vw")
 
 [node name="raft" parent="scene" instance=ExtResource("2_4uok2")]
 transform = Transform3D(0.920206, 0.0373214, -0.389652, -0.0388801, 0.999236, 0.00388873, 0.3895, 0.0115713, 0.920954, 1.88043, 0, -1.18836)
