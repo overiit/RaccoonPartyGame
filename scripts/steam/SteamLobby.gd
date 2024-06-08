@@ -292,7 +292,9 @@ func _leave_Lobby() -> void:
 
 	
 func _handlePacket(steam_id: int, message: String, data: Dictionary):
-	if message == "ready":
+	if message == "connected":
+		onPlayerConnected.emit(steam_id)
+	elif message == "ready":
 		print("Ready from: " + str(steam_id))
 		onPlayerReady.emit(steam_id)
 	elif message == "unready":

@@ -54,7 +54,7 @@ func broadcast():
 		# Broadcast everything
 		"global_position": vehicle_node.global_position,
 		"global_transform": vehicle_node.global_transform,
-		"velocity": vehicle_node.linear_velocity,
+		"linear_velocity": vehicle_node.linear_velocity,
 		"angular_velocity": vehicle_node.angular_velocity,
 
 		#"speed": vehicle_node.speed,
