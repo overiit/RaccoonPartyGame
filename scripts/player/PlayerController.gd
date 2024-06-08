@@ -82,8 +82,8 @@ func onEntityUnmount():
 
 func onPlayerMove(steam_id: int, pos: Vector3, rot: Vector3, animation: String):
 	if get_authority() == steam_id:
-		next_networked_position = pos
-		#position = pos
+		#next_networked_position = pos
+		position = pos
 		visual_char.rotation.y = rot.y
 		if animation.length() > 0:
 			anim_player.play(animation)
@@ -113,8 +113,8 @@ func repositionCamera(relativeX, relativeY):
 
 func _process(delta):
 	if !is_authority():
-		current_networked_position = current_networked_position.lerp(next_networked_position, 0.1)
-		position = current_networked_position
+		#current_networked_position = current_networked_position.lerp(next_networked_position, 0.1)
+		#position = current_networked_position
 		return
 	# TODO limit to 60 ticks even if game is 144 ticks
 	broadcastPosition();
