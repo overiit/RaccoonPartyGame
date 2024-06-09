@@ -71,8 +71,8 @@ func spawnPlayer(id: int, position: Vector3=Vector3(0, 15, 0)):
 	print("spawn player: " + str(id))
 	var player = PlayerScene.instantiate() as Player
 	player.set_authority(id)
-	player.global_position = position
 	get_tree().root.add_child(player)
+	player.global_position = position
 
 func despawnPlayer(id: int):
 	if not EntityManager.players.has(id):
