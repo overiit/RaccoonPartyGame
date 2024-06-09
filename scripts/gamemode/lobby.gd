@@ -1,16 +1,13 @@
-extends Node3D
+extends Gamemode
 
 @export var spawnPoint: Node3D
 
 func _ready():
-	SteamLobby.onPlayerConnected.connect(_onPlayerConnected)
-	EntityManager.spawnPlayer(SteamAccount.STEAM_ID, spawnPoint.global_position)
+	onGameModeReady.connect(_onGameModeReady)
 
-func _process(_delta):
+func _onGameModeReady(steam_id: int):
+	EntityManager.spawnPlayer(steam_id, spawnPoint.global_position)
+
+func process_player(_delta):
 	if Input.is_action_just_pressed("ready_up"):
 		GameState.toggleReady()
-	if Input.is_action_just_pressed("ui_cancel"):
-		SteamLobby.leave()
-
-func _onPlayerConnected(id: int):
-	EntityManager.spawnPlayer(id, spawnPoint.global_position)

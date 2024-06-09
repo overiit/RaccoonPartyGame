@@ -16,17 +16,11 @@ var entityNodes: Dictionary = {}
 
 func _ready():
 	SteamNetwork.onPacket.connect(_onPacket)
-	GameState.onSessionStateChange.connect(_onSessionStateChange)
 
 func refresh():
 	if !SteamLobby.is_host():
 		SteamNetwork.sendPacket(SteamLobby.host_id, "request_entities", {})
-
-func _onSessionStateChange():
-	if GameState.sessionState == GameState.SessionState.NONE:
-		clear()
-	else:
-		refresh()
+		SteamNetwork.sendPacket(SteamLobby.host_id, "request_player", {})
 
 func clear():
 	for player in players.values():
@@ -45,6 +39,9 @@ func _onPacket(sender: int, message: String, data: Dictionary):
 	if SteamLobby.is_host():
 		if message == "request_entities":
 			notifyEntities(sender)
+		elif message == "request_players":
+			# notifyPlayers(sender)
+			pass
 		return
 	else:
 		# if sender is not the host, ignore the message
@@ -53,26 +50,29 @@ func _onPacket(sender: int, message: String, data: Dictionary):
 		
 		if message == "entities":
 			receivedEntities(data)
-
-func _refreshEntities():
-	for entity in entityNodes.values():
-		entity.queue_free()
-	entities.clear()
+		elif message == "spawn_player":
+			spawnPlayer(data["steam_id"], data["position"], data['rotY'])
 
 
 ######
 # Players
 ######
 
-func spawnPlayer(id: int, position: Vector3=Vector3(0, 15, 0)):
+func spawnPlayer(id: int, position=null, rotY=null):
 	if EntityManager.players.has(id):
 		print("Warning: Failed spawning "  + str(id) + " as they already exist")
 		return
+	
 	print("spawn player: " + str(id))
 	var player = PlayerScene.instantiate() as Player
 	player.set_authority(id)
 	get_tree().root.add_child(player)
-	player.global_position = position
+	if position != null:
+		player.position = position
+	
+	if rotY != null:
+		player.visual_char.rotation.y = rotY
+		
 
 func despawnPlayer(id: int):
 	if not EntityManager.players.has(id):

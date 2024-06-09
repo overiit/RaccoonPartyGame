@@ -51,6 +51,15 @@ func _init():
 
 func _ready():
 	camera.set_current(is_authority())
+
+	if SteamLobby.is_host():
+		SteamNetwork.sendPacket(0, "spawn_player", {
+			"steam_id": steam_id,
+			"position": position,
+			"rotY": visual_char.rotation.y,
+			"animation": "Idle"
+		})
+
 	SteamNetwork.onPacket.connect(_onPacket)
 	SteamLobby.onPlayerLobbyLeft.connect(_onPlayerLobbyLeft)
 
@@ -63,8 +72,8 @@ func _onPlayerLobbyLeft(id: int):
 func _onPacket(_steam_id: int, message: String, data: Dictionary):
 	if message == "pos" && _steam_id == steam_id:
 		onPlayerMove(
-			Vector3(data['x'], data['y'], data['z']),
-			Vector3(0, data['rotY'], 0),
+			data['position'],
+			data['rotY'],
 			data['animation']
 		)
 
@@ -89,10 +98,9 @@ func onEntityUnmount():
 	if is_authority():
 		camera.set_current(true)
 
-func onPlayerMove(pos: Vector3, rot: Vector3, animation: String):
-	#next_networked_position = pos
+func onPlayerMove(pos: Vector3, rotY: float, animation: String):
 	position = pos
-	visual_char.rotation.y = rot.y
+	visual_char.rotation.y = rotY
 	if animation.length() > 0:
 		anim_player.play(animation)
 
@@ -119,12 +127,19 @@ func repositionCamera(relativeX, relativeY):
 
 	camera.look_at(camera_mount.global_transform.origin)	
 
-func _process(delta):
+func _process(_delta):
 	if !is_authority():
 		return
 	# TODO limit to 60 ticks even if game is 144 ticks
-	# broadcastPosition();
-	
+	broadcastPosition();
+
+func broadcastPosition():
+	SteamNetwork.sendPacket(0, "pos", {
+		"position": position,
+		"rotY": visual_char.rotation.y,
+		"animation": anim_player.current_animation
+	})
+
 func _physics_process(delta):
 	if !is_authority():
 		return
