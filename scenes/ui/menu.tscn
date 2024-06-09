@@ -1,7 +1,7 @@
 [gd_scene load_steps=18 format=3 uid="uid://bslpjiwa6kypm"]
 
 [ext_resource type="PackedScene" uid="uid://1gfropwtqfbn" path="res://addons/GodotSky/GodotSky.tscn" id="1_bo2b7"]
-[ext_resource type="Script" path="res://scripts/LobbyMenu.gd" id="1_ny332"]
+[ext_resource type="Script" path="res://scripts/custom/LobbyMenu.gd" id="1_fjjq2"]
 [ext_resource type="FontFile" uid="uid://qt3ysfxx71d1" path="res://utils/fonts/Montserrat-ExtraBold.ttf" id="1_ycbq4"]
 [ext_resource type="PackedScene" uid="uid://ctmgsj5d8fc3b" path="res://models/ocean/raft.blend" id="2_4uok2"]
 [ext_resource type="PackedScene" uid="uid://b08h1wjm624o8" path="res://models/characters/raccoony.blend" id="2_udibb"]
@@ -208,7 +208,7 @@ transform = Transform3D(2.29802, 0, -0.550833, 0, 2.52543, 0, 0.854627, 0, 1.481
 material_override = ExtResource("3_xu37o")
 
 [node name="LobbyMenu" type="CanvasLayer" parent="."]
-script = ExtResource("1_ny332")
+script = ExtResource("1_fjjq2")
 
 [node name="Control" type="Control" parent="LobbyMenu"]
 layout_mode = 3

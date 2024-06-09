@@ -18,9 +18,7 @@ const interact_distance_threshold = 1.5;
 const WALK_SPEED = 4.6
 const SPRINT_SPEED = 8.0
 var speed = WALK_SPEED
-
-var current_networked_position: Vector3 = Vector3.ZERO
-var next_networked_position: Vector3 = Vector3.ZERO
+var gravity = 20
 
 enum States {IDLE, RUN, SPRINT, JUMP, FALL, DROP_RUN_ROLL} 
 var state = States.IDLE
@@ -30,30 +28,41 @@ const JUMP_VELOCITY = 10.0
 @export var sens_horizontal = 0.5;
 @export var sens_vertical = 0.5;
 
-var health = 100
-var money = 0
-var items = []
-
-var gravity = 20
+var steam_id: int = 0
 
 var mounted_to : Mountable = null
 
+func set_authority(_steam_id: int):
+	steam_id = _steam_id
+	visible = true
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	EntityManager.players[steam_id] = self
+
+func _exit_tree():
+	if steam_id > 0:
+		EntityManager.players.erase(steam_id)
+
 func is_authority() -> bool:
-	return get_authority() == SteamAccount.STEAM_ID
-	
-func get_authority() -> int:
-	if has_meta("steam_id"):
-		return get_meta("steam_id")
-	return 0
+	return steam_id == SteamAccount.STEAM_ID
+
+func _init():
+	visible = false
+	process_mode = Node.PROCESS_MODE_DISABLED
 
 func _ready():
 	camera.set_current(is_authority())
 	SteamNetwork.onPacket.connect(_onPacket)
+	SteamLobby.onPlayerLobbyLeft.connect(_onPlayerLobbyLeft)
 
-func _onPacket(steam_id: int, message: String, data: Dictionary):
-	if message == "pos":
+func _onPlayerLobbyLeft(id: int):
+	if not EntityManager.players.has(id):
+		return
+	EntityManager.players[id].queue_free()
+	EntityManager.players.erase(id);
+
+func _onPacket(_steam_id: int, message: String, data: Dictionary):
+	if message == "pos" && _steam_id == steam_id:
 		onPlayerMove(
-			steam_id,
 			Vector3(data['x'], data['y'], data['z']),
 			Vector3(0, data['rotY'], 0),
 			data['animation']
@@ -80,13 +89,12 @@ func onEntityUnmount():
 	if is_authority():
 		camera.set_current(true)
 
-func onPlayerMove(steam_id: int, pos: Vector3, rot: Vector3, animation: String):
-	if get_authority() == steam_id:
-		#next_networked_position = pos
-		position = pos
-		visual_char.rotation.y = rot.y
-		if animation.length() > 0:
-			anim_player.play(animation)
+func onPlayerMove(pos: Vector3, rot: Vector3, animation: String):
+	#next_networked_position = pos
+	position = pos
+	visual_char.rotation.y = rot.y
+	if animation.length() > 0:
+		anim_player.play(animation)
 
 func _unhandled_input(event):
 	if mounted_to != null:
@@ -113,23 +121,15 @@ func repositionCamera(relativeX, relativeY):
 
 func _process(delta):
 	if !is_authority():
-		#current_networked_position = current_networked_position.lerp(next_networked_position, 0.1)
-		#position = current_networked_position
 		return
 	# TODO limit to 60 ticks even if game is 144 ticks
-	broadcastPosition();
+	# broadcastPosition();
 	
 func _physics_process(delta):
 	if !is_authority():
 		return
 		
 	update_closest_interactable();
-	
-	if mounted_to != null:
-		if Input.is_action_just_pressed("jump"):
-			mounted_to.unmount()
-			pass
-		return
 	
 	repositionCamera(0, 0)
 	var input_dir = Input.get_vector("left", "right", "up", "down")
@@ -169,15 +169,6 @@ func _physics_process(delta):
 	
 	play_animation()
 	move_and_slide()
-
-func broadcastPosition(steam_id: int = 0):
-	SteamNetwork.sendPacket(0, "pos", {
-		"x": position.x,
-		"y": position.y,
-		"z": position.z,
-		"rotY": visual_char.rotation.y,
-		"animation": anim_player.current_animation,
-	}, false, Steam.P2P_SEND_UNRELIABLE_NO_DELAY)
 
 func play_animation():
 	match state:

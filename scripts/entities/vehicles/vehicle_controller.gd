@@ -43,7 +43,7 @@ func broadcast():
 	var broadcast = false
 	if vehicle_mount.is_authority():
 		broadcast = true
-	elif vehicle_mount.get_authority() == 0 && SteamLobby.is_host():
+	elif vehicle_mount.mounted_by == 0 && SteamLobby.is_host():
 		broadcast = true
 		
 	if !broadcast:

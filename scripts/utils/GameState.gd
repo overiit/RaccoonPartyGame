@@ -27,7 +27,7 @@ var countdown: float = 0
 var READY_PLAYERS: Array = [];
 
 signal onSessionStateChange()
-signal onModeChange()
+# signal onModeChange()
 
 
 func _ready():
@@ -66,6 +66,8 @@ func _handleStateChange():
 			print("gamemode unkown: " + str(mode))
 	else:
 		print("state unknown: " + str(sessionState))
+	
+	onSessionStateChange.emit()
 
 
 func startRound():

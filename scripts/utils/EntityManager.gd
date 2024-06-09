@@ -1,6 +1,135 @@
 extends Node
 
+## Maps: steam_id -> PlayerData
 var players: Dictionary = {};
+
 var entities: Dictionary = {}
 
 var entityNodes: Dictionary = {}
+
+@onready var PlayerScene = preload("res://scenes/characters/player.tscn");
+
+@onready var GLOBAL_ENTITIES = {
+	"jeep": preload("res://scenes/entities/vehicles/jeep_babycar.tscn"),
+	"sportscar": preload("res://scenes/entities/vehicles/sportscar_babycar.tscn")
+}
+
+func _ready():
+	SteamNetwork.onPacket.connect(_onPacket)
+	GameState.onSessionStateChange.connect(_onSessionStateChange)
+
+func refresh():
+	if !SteamLobby.is_host():
+		SteamNetwork.sendPacket(SteamLobby.host_id, "request_entities", {})
+
+func _onSessionStateChange():
+	if GameState.sessionState == GameState.SessionState.NONE:
+		clear()
+	else:
+		refresh()
+
+func clear():
+	for player in players.values():
+		player.queue_free()
+	players.clear()
+
+	for entity in entityNodes.values():
+		entity.queue_free()
+	entities.clear()
+
+	if SteamLobby.is_host():
+		notifyEntities(0)
+
+func _onPacket(sender: int, message: String, data: Dictionary):
+	# If I am the host, handle the message
+	if SteamLobby.is_host():
+		if message == "request_entities":
+			notifyEntities(sender)
+		return
+	else:
+		# if sender is not the host, ignore the message
+		if sender != SteamLobby.host_id:
+			return 
+		
+		if message == "entities":
+			receivedEntities(data)
+
+func _refreshEntities():
+	for entity in entityNodes.values():
+		entity.queue_free()
+	entities.clear()
+
+
+######
+# Players
+######
+
+func spawnPlayer(id: int, position: Vector3=Vector3(0, 15, 0)):
+	if EntityManager.players.has(id):
+		print("Warning: Failed spawning "  + str(id) + " as they already exist")
+		return
+	print("spawn player: " + str(id))
+	var player = PlayerScene.instantiate() as Player
+	player.set_authority(id)
+	player.global_position = position
+	get_tree().root.add_child(player)
+
+func despawnPlayer(id: int):
+	if not EntityManager.players.has(id):
+		print("Warning: Failed despawning "  + str(id) + " as they do not exist")
+		return
+	EntityManager.players[id].queue_free()
+	EntityManager.players.erase(id)
+
+
+######
+# Entities
+######
+
+func notifyEntities(steam_id: int):
+	var data = {
+		"entities": EntityManager.entities,
+	}
+	SteamNetwork.sendPacket(steam_id, "entities", data)
+	pass
+
+func receivedEntities(_data: Dictionary):
+	var data = _data["entities"]
+	
+	for key in data.keys():
+		var entity = data[key]
+		spawnEntity(entity["id"], entity["type"], entity["position"], entity["rotation"])
+	pass
+
+func spawnEntity(id: int, type: String, _position: Vector3, _rotation: Vector3):
+	if not GLOBAL_ENTITIES.has(type):
+		print("Warning: Entity type " + type + " does not exist")
+		return
+
+	# add if doesnt exist
+	if EntityManager.entityNodes.has(id):
+		print("Warning: Failed spawning "  + str(id) + " as they already exist")
+		return
+	
+	EntityManager.entities[id] = {
+		"id": id,
+		"type": type,
+		"position": _position,
+		"rotation": _rotation,
+	}
+	
+	var scene = GLOBAL_ENTITIES[type]
+	var entity = scene.instantiate()
+	var ent = Utils.findNodeOfType(entity, Entity)
+	ent.set_entity_id(id)
+	entity.position = _position
+	entity.rotation = _rotation
+	EntityManager.entityNodes[id] = entity
+	add_child(entity)
+	
+
+	if SteamLobby.is_host():
+		notifyEntities(0)
+		print(EntityManager.entities)
+
+	return

@@ -3,6 +3,8 @@ class_name Entity
 
 @onready var entity_id: int
 
+var entity_type: String = ""
+
 func _ready():
 	pass
 

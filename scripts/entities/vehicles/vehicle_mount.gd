@@ -5,9 +5,10 @@ func _ready():
 	if not get_parent() is Vehicle:
 		print("Parent is not a vehicle")
 		return;
+	onMounted.connect(_onMounted)
+	onUnmounted.connect(_onUnmounted)
 
-func onMounted(steam_id: int):
-	super.onMounted(steam_id)
+func _onMounted(steam_id: int):
 	if EntityManager.players.has(steam_id):
 		var player : Player = EntityManager.players[steam_id]
 		var vehicle: Vehicle = get_parent();
@@ -19,20 +20,16 @@ func onMounted(steam_id: int):
 		if steam_id == SteamAccount.STEAM_ID:
 			vehicle.controller.camera.make_current()
 
-func onUnmounted(steam_id: int):
-	super.onUnmounted(steam_id) 
+func _onUnmounted(steam_id: int):
 	print("a")
 	if EntityManager.players.has(steam_id):
 		var player : Player = EntityManager.players[steam_id]
 		# TODO: reparent to 
-		var parent = Utils.findNodeOfType(get_tree().current_scene, EntitySpawner)
-		if parent == null:
-			# fallback to scene lol
-			parent = get_tree().current_scene
+		var parent = get_tree().current_scene
 		print("b")
 		player.reparent(parent)
 		# TODO fix player position
-		player.global_position = parent.global_position
+		player.global_position = Vector3(0, 15, 0)
 		player.velocity = Vector3.ZERO
 		player.rotation.y = 0
 		player.onEntityUnmount()

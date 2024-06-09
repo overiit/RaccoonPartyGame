@@ -15,8 +15,11 @@ signal onHostChanged(to_steam_id: int)
 
 # # lobby
 signal onLobbyCreated(lobby_id: int)
-signal onLobbyJoined(lobby_id: int)
-signal onLobbyConnected(lobby_id: int)
+
+signal onLobbyJoined(lobby_id: int) # steam lobby created
+signal onLobbyConnected(lobby_id: int) # all peers connected
+signal onLobbyLoaded(lobby_id: int) # all gamestate synced
+
 signal onLobbyUpdated(lobby_id: int)
 signal onLobbyLeft(lobby_id: int)
 signal onLobbyReady(lobby_id: int)
@@ -61,7 +64,7 @@ func _check_Command_Line() -> void:
 func _process(_delta):
 	if lobby_id > 0:
 		# Get the host of the lobby
-		# TODO: Optimize this to only run on lobby update?
+		# TODO: Optimize this to only run on lobby update / when the host leaves / when the host changes
 		var new_host_id: int = Steam.getLobbyOwner(lobby_id)
 		if new_host_id != host_id:
 			host_id = new_host_id
@@ -79,8 +82,7 @@ func create() -> void:
 	clearLobbySession()
 	
 	get_tree().change_scene_to_packed(ConnectingScene)
-
-	members.clear()
+	clearLobbySession()
 
 	Steam.createLobby(Steam.LOBBY_TYPE_FRIENDS_ONLY, LOBBY_MAX_MEMBERS)
 
