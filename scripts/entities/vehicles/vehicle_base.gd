@@ -603,17 +603,26 @@ func initialize():
 				##global_position.lerp(, 64)
 				#global_transform = data['global_transform']
 
+var target_global_position
+
 func onEntityMove(steam_id: int, message: String, data: Dictionary):
-	print('entity_move')
 	if message == "entity_move":
 		# Trust source
 		if steam_id == SteamLobby.host_id || controller.vehicle_mount.get_authority() == steam_id:
 			if controller.vehicle_mount.entity_id == data['id']:
-				global_position = data['global_position']
+				target_global_position = data['global_position']
 				global_transform = data['global_transform']
 				linear_velocity = data['linear_velocity']
 				angular_velocity = data['angular_velocity']
 
+func _process(delta):
+	if not is_ready:
+		return
+	if controller.vehicle_mount != null and controller.vehicle_mount.get_authority() != SteamAccount.STEAM_ID:
+		if target_global_position != null:
+			global_position = global_position.lerp(target_global_position, 0.1)
+			
+	
 func _physics_process(delta):
 	if not is_ready:
 		return
