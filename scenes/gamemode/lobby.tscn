@@ -4,8 +4,9 @@
 [ext_resource type="PackedScene" uid="uid://1gfropwtqfbn" path="res://addons/GodotSky/GodotSky.tscn" id="2_pgr8u"]
 [ext_resource type="PackedScene" uid="uid://tu1hyuymiywq" path="res://models/maps/lobby.blend" id="2_v24rj"]
 
-[node name="GameLobby" type="Node3D"]
+[node name="GameLobby" type="Node3D" node_paths=PackedStringArray("spawnPoint")]
 script = ExtResource("1_qcvtm")
+spawnPoint = NodePath("Spawn")
 
 [node name="GodotSky" parent="." instance=ExtResource("2_pgr8u")]
 timeOfDay = 1400.0
@@ -53,4 +54,4 @@ layout_mode = 2
 text = "READY"
 
 [node name="Spawn" type="Node3D" parent="."]
-transform = Transform3D(0.999989, -0.00474728, 0, 0.00474728, 0.999989, 0, 0, 0, 1, 0, 0.592287, 1.96589)
+transform = Transform3D(0.999989, -0.00474728, 0, 0.00474728, 0.999989, 0, 0, 0, 1, 0, 0.968447, 1.96589)
