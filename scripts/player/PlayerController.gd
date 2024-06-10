@@ -109,10 +109,10 @@ func onEntityUnmount():
 	if is_authority():
 		camera.set_current(true)
 
-func onPlayerMove(pos: Vector3, rotY: float, velocity: Vector3, animation: String):
+func onPlayerMove(pos: Vector3, rotY: float, _velocity: Vector3, animation: String):
 	position = pos
 	visual_char.rotation.y = rotY
-	velocity = velocity
+	velocity = _velocity
 	if animation.length() > 0:
 		anim_player.play(animation)
 
