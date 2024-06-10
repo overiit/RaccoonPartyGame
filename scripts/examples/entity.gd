@@ -30,6 +30,7 @@ func set_entity(id: int, type: String):
 func sendSpawnPacket(to: int = 0):
 	SteamNetwork.sendPacket(to, "spawn_entity", {
 		"id": entity_id,
+		"type": entity_type,
 		"position": position,
 		"rotation": rotation
 	})
