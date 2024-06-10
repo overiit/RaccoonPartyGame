@@ -4,6 +4,7 @@ extends Gamemode
 
 func _ready():
 	onGameModeReady.connect(_onGameModeReady)
+	super._ready()
 
 func _onGameModeReady(steam_id: int):
 	EntityManager.spawnPlayer(steam_id, spawnPoint.global_position)
