@@ -132,6 +132,5 @@ func spawnEntity(id: int, type: String, _position: Vector3, _rotation: Vector3):
 
 	if SteamLobby.is_host():
 		notifyEntities(0)
-		print(EntityManager.entities)
 
 	return

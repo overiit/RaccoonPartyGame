@@ -8,6 +8,10 @@ func _ready():
 	onMounted.connect(_onMounted)
 	onUnmounted.connect(_onUnmounted)
 
+func _exit_tree():
+	if get_parent() is Vehicle:
+		get_parent().queue_free()
+
 func _onMounted(steam_id: int):
 	if EntityManager.players.has(steam_id):
 		var player : Player = EntityManager.players[steam_id]
