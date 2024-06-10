@@ -113,6 +113,7 @@ func onPlayerMove(pos: Vector3, rotY: float, _velocity: Vector3, animation: Stri
 	position = pos
 	visual_char.rotation.y = rotY
 	velocity = _velocity
+	print(str(steam_id) + ": " + str(velocity))
 	if animation.length() > 0:
 		anim_player.play(animation)
 
@@ -143,7 +144,6 @@ func _process(_delta):
 	if !is_authority():
 		return
 	# TODO limit to 60 ticks even if game is 144 ticks
-	broadcastPosition();
 
 func broadcastPosition():
 	SteamNetwork.sendPacket(0, "pos", {
@@ -197,6 +197,8 @@ func _physics_process(delta):
 	
 	play_animation()
 	move_and_slide()
+
+	broadcastPosition()
 
 func play_animation():
 	match state:
