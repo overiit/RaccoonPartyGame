@@ -59,6 +59,7 @@ func _ready():
 	SteamLobby.onPlayerLobbyLeft.connect(_onPlayerLobbyLeft)
 
 func sendSpawnPacket(to: int=0):
+	print("Send Spawn (" + str(steam_id) + ") to (" + str(to) + ")")
 	SteamNetwork.sendPacket(to, "spawn_player", {
 		"steam_id": steam_id,
 		"position": position,
