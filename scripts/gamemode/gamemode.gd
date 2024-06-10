@@ -21,7 +21,7 @@ func _process(delta):
 	
 	if SteamLobby.is_host():
 		process_host(delta)
-	elif SteamLobby.is_client():
+	else:
 		process_client(delta)
 	process_player(delta)
 

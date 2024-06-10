@@ -40,7 +40,7 @@ func _onPacket(sender: int, message: String, data: Dictionary):
 		if message == "request_entities":
 			notifyEntities(sender)
 		elif message == "request_players":
-			# notifyPlayers(sender)
+			notifyPlayers(sender)
 			pass
 		return
 	else:
@@ -57,6 +57,11 @@ func _onPacket(sender: int, message: String, data: Dictionary):
 ######
 # Players
 ######
+
+func notifyPlayers(steam_id: int):
+	for player in EntityManager.players.values():
+		player.sendSpawnPacket(steam_id)
+	pass
 
 func spawnPlayer(id: int, position=null, rotY=null):
 	if EntityManager.players.has(id):

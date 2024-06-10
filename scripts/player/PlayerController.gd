@@ -53,15 +53,18 @@ func _ready():
 	camera.set_current(is_authority())
 
 	if SteamLobby.is_host():
-		SteamNetwork.sendPacket(0, "spawn_player", {
-			"steam_id": steam_id,
-			"position": position,
-			"rotY": visual_char.rotation.y,
-			"animation": "Idle"
-		})
+		sendSpawnPacket()
 
 	SteamNetwork.onPacket.connect(_onPacket)
 	SteamLobby.onPlayerLobbyLeft.connect(_onPlayerLobbyLeft)
+
+func sendSpawnPacket(to: int=0):
+	SteamNetwork.sendPacket(to, "spawn_player", {
+		"steam_id": steam_id,
+		"position": position,
+		"rotY": visual_char.rotation.y,
+		"animation": "Idle"
+	})
 
 func _onPlayerLobbyLeft(id: int):
 	if not EntityManager.players.has(id):
