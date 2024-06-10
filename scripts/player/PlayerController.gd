@@ -56,6 +56,7 @@ func _ready():
 		sendSpawnPacket()
 
 	SteamNetwork.onPacket.connect(_onPacket)
+	SteamLobby.onPlayerConnected.connect(_onPlayerConnected)
 	SteamLobby.onPlayerLobbyLeft.connect(_onPlayerLobbyLeft)
 
 func sendSpawnPacket(to: int=0):
@@ -66,6 +67,11 @@ func sendSpawnPacket(to: int=0):
 		"rotY": visual_char.rotation.y,
 		"animation": "Idle"
 	})
+
+func _onPlayerConnected(id: int):
+	if id == steam_id:
+		return
+	sendSpawnPacket(id)
 
 func _onPlayerLobbyLeft(id: int):
 	if not EntityManager.players.has(id):
@@ -78,6 +84,7 @@ func _onPacket(_steam_id: int, message: String, data: Dictionary):
 		onPlayerMove(
 			data['position'],
 			data['rotY'],
+			data['velocity'],
 			data['animation']
 		)
 
@@ -102,7 +109,7 @@ func onEntityUnmount():
 	if is_authority():
 		camera.set_current(true)
 
-func onPlayerMove(pos: Vector3, rotY: float, animation: String):
+func onPlayerMove(pos: Vector3, rotY: float, velocity: Vector3, animation: String):
 	position = pos
 	visual_char.rotation.y = rotY
 	if animation.length() > 0:
@@ -141,6 +148,7 @@ func broadcastPosition():
 	SteamNetwork.sendPacket(0, "pos", {
 		"position": position,
 		"rotY": visual_char.rotation.y,
+		"velocity": velocity,
 		"animation": anim_player.current_animation
 	})
 
