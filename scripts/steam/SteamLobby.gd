@@ -81,8 +81,8 @@ func create() -> void:
 
 	clearLobbySession()
 	
-	get_tree().change_scene_to_packed(ConnectingScene)
 	clearLobbySession()
+	get_tree().change_scene_to_packed(ConnectingScene)
 
 	Steam.createLobby(Steam.LOBBY_TYPE_FRIENDS_ONLY, LOBBY_MAX_MEMBERS)
 
@@ -92,8 +92,8 @@ func join(_lobby_id: int) -> void:
 
 	print("Attempting to join lobby "+str(_lobby_id)+"...")
 	
-	get_tree().change_scene_to_packed(ConnectingScene)
 	clearLobbySession()
+	get_tree().change_scene_to_packed(ConnectingScene)
 	
 	Steam.joinLobby(_lobby_id)
 
@@ -109,6 +109,7 @@ func leave(backToMenu: bool=true) -> void:
 
 func clearLobbySession():
 	SteamNetwork.clearP2PConnections()
+	EntityManager.clear()
 	members.clear()
 	lobby_id = 0
 	is_ready = false

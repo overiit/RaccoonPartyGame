@@ -5,8 +5,6 @@ var players: Dictionary = {};
 
 var entities: Dictionary = {}
 
-var entityNodes: Dictionary = {}
-
 @onready var PlayerScene = preload("res://scenes/characters/player.tscn");
 
 @onready var GLOBAL_ENTITIES = {
@@ -19,6 +17,7 @@ func _ready():
 
 func refresh():
 	if !SteamLobby.is_host():
+		clear()
 		SteamNetwork.sendPacket(SteamLobby.host_id, "request_entities", {})
 		SteamNetwork.sendPacket(SteamLobby.host_id, "request_player", {})
 
@@ -27,7 +26,7 @@ func clear():
 		player.queue_free()
 	players.clear()
 
-	for entity in entityNodes.values():
+	for entity in entities.values():
 		entity.queue_free()
 	entities.clear()
 
@@ -48,8 +47,8 @@ func _onPacket(sender: int, message: String, data: Dictionary):
 		if sender != SteamLobby.host_id:
 			return 
 		
-		if message == "entities":
-			receivedEntities(data)
+		if message == "spawn_entity":
+			spawnEntity(data["id"], data["type"], data["position"], data["rotation"])
 		elif message == "spawn_player":
 			spawnPlayer(data["steam_id"], data["position"], data['rotY'])
 
@@ -92,11 +91,8 @@ func despawnPlayer(id: int):
 ######
 
 func notifyEntities(steam_id: int):
-	var data = {
-		"entities": EntityManager.entities,
-	}
-	SteamNetwork.sendPacket(steam_id, "entities", data)
-	pass
+	for entity in entities.values():
+		entity.sendSpawnPacket(steam_id)
 
 func receivedEntities(_data: Dictionary):
 	var data = _data["entities"]
@@ -111,26 +107,27 @@ func spawnEntity(id: int, type: String, _position: Vector3, _rotation: Vector3):
 		print("Warning: Entity type " + type + " does not exist")
 		return
 
+	var scene = GLOBAL_ENTITIES[type]
+
 	# add if doesnt exist
-	if EntityManager.entityNodes.has(id):
+	if entities.has(id):
 		print("Warning: Failed spawning "  + str(id) + " as they already exist")
 		return
-	
-	EntityManager.entities[id] = {
-		"id": id,
-		"type": type,
-		"position": _position,
-		"rotation": _rotation,
-	}
-	
-	var scene = GLOBAL_ENTITIES[type]
-	var entity = scene.instantiate()
-	var ent = Utils.findNodeOfType(entity, Entity)
-	ent.set_entity_id(id)
-	entity.position = _position
-	entity.rotation = _rotation
-	EntityManager.entityNodes[id] = entity
-	add_child(entity)
+
+	if id == 0:
+		if SteamLobby.is_host():
+			id = Utils.genEntityId()
+		else:
+			print("Warning: Failed spawning "  + str(id) + " as the ID is invalid")
+		return
+
+	var instance = scene.instantiate()
+	var entity = Utils.findNodeOfType(instance, Entity)
+	entity.set_entity(id, type)
+	entities[id] = instance
+	get_tree().root.add_child(instance)
+	instance.position = _position
+	instance.rotation = _rotation
 	
 
 	if SteamLobby.is_host():

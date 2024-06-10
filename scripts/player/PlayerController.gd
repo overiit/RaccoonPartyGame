@@ -71,6 +71,8 @@ func sendSpawnPacket(to: int=0):
 func _onPlayerConnected(id: int):
 	if id == steam_id:
 		return
+	if !SteamLobby.is_host():
+		return
 	sendSpawnPacket(id)
 
 func _onPlayerLobbyLeft(id: int):
@@ -155,6 +157,7 @@ func broadcastPosition():
 
 func _physics_process(delta):
 	if !is_authority():
+		move_and_slide()
 		return
 		
 	update_closest_interactable();

@@ -1,12 +1,35 @@
 extends Node3D
 class_name Entity
 
+@export var auto_spawn: bool = false
+@export_enum(
+	"jeep", "sportscar"
+) var entity_type: String
+
 @onready var entity_id: int
 
-var entity_type: String = ""
+
+func _init():
+	visible = false
+	process_mode = Node.PROCESS_MODE_DISABLED
 
 func _ready():
+	if auto_spawn:
+		set_entity(Utils.genEntityId(), entity_type)
+	if SteamLobby.is_host():
+		sendSpawnPacket()
 	pass
 
-func set_entity_id(id: int):
+func set_entity(id: int, type: String):
 	entity_id = id
+	entity_type = type
+	visible = true
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	EntityManager.entities[id] = self
+
+func sendSpawnPacket(to: int = 0):
+	SteamNetwork.sendPacket(to, "spawn_entity", {
+		"id": entity_id,
+		"position": position,
+		"rotation": rotation
+	})
