@@ -195,10 +195,11 @@ func _physics_process(delta):
 		velocity.x = 0
 		velocity.z = 0
 	
+	broadcastPosition()
+	
 	play_animation()
 	move_and_slide()
 
-	broadcastPosition()
 
 func play_animation():
 	match state:
