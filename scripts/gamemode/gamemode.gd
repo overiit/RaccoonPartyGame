@@ -9,6 +9,7 @@ func _ready():
 		onGameModeReady.emit(SteamAccount.STEAM_ID)
 	else:
 		SteamNetwork.sendPacket(SteamLobby.host_id, "gamemode_ready")
+		onGameModeReady.emit(SteamAccount.STEAM_ID)
 
 func _onPacket(steam_id: int, message: String, _data: Dictionary):
 	if message == "gamemode_ready":

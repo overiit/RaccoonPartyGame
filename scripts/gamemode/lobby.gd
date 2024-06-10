@@ -7,7 +7,8 @@ func _ready():
 	super._ready()
 
 func _onGameModeReady(steam_id: int):
-	EntityManager.spawnPlayer(steam_id, spawnPoint.global_position)
+	if SteamLobby.is_host():
+		EntityManager.spawnPlayer(steam_id, spawnPoint.global_position)
 	EntityManager.refresh()
 
 func process_player(_delta):
