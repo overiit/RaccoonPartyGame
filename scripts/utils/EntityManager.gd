@@ -2,7 +2,6 @@ extends Node
 
 ## Maps: steam_id -> PlayerData
 var players: Dictionary = {};
-
 var entities: Dictionary = {}
 
 @onready var PlayerScene = preload("res://scenes/characters/player.tscn");
@@ -122,10 +121,11 @@ func spawnEntity(id: int, type: String, _position: Vector3, _rotation: Vector3):
 		return
 
 	var instance = scene.instantiate()
+	# entity might be a child of the instance
 	var entity = Utils.findNodeOfType(instance, Entity)
 	entity.set_entity(id, type)
-	entities[id] = instance
 	get_tree().root.add_child(instance)
+	entities[id] = entity
 	instance.position = _position
 	instance.rotation = _rotation
 	
