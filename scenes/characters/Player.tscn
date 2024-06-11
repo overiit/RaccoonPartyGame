@@ -36,11 +36,15 @@ mouse_filter = 1
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Control"]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = 12
+anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 308.0
+offset_top = -111.0
+offset_right = -308.0
 grow_horizontal = 2
-grow_vertical = 2
+grow_vertical = 0
 alignment = 2
 
 [node name="InteractLabel" type="Label" parent="Control/VBoxContainer"]
@@ -50,6 +54,11 @@ theme_override_fonts/font = ExtResource("4_4oydo")
 theme_override_font_sizes/font_size = 20
 text = "Interact"
 horizontal_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="Control/VBoxContainer"]
+visible = false
+layout_mode = 2
+show_percentage = false
 
 [node name="MarginContainer" type="MarginContainer" parent="Control/VBoxContainer"]
 layout_mode = 2

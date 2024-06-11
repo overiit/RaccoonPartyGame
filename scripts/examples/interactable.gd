@@ -23,6 +23,7 @@ func onPacket(steam_id: int, message: String, data: Dictionary):
 				onInteract.emit(steam_id)
 
 func interact():
+	print("Interacted with ", entity_id)
 	if !SteamLobby.is_host():
 		SteamNetwork.sendPacket(SteamLobby.host_id, "interact", {
 			"entity_id": entity_id,

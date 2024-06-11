@@ -7,13 +7,14 @@ enum ViewMode { FIRST_PERSON, THIRD_PERSON }
 @onready var anim_player = $raccoony/AnimationPlayer
 @onready var camera_mount = $camera_mount
 @onready var visual_char = $raccoony
-@onready var interact_label = $Control/VBoxContainer/InteractLabel
+@onready var label = $Control/VBoxContainer/InteractLabel
+@onready var progressbar = $Control/VBoxContainer/ProgressBar
 @onready var collisionShape = $CollisionShape3D
 
 @export
 var PlayerViewMode = ViewMode.THIRD_PERSON
 
-const interact_distance_threshold = 1.5;
+const interact_distance_threshold = 3.0;
 
 const WALK_SPEED = 4.6
 const SPRINT_SPEED = 8.0
@@ -50,7 +51,8 @@ func _init():
 	process_mode = Node.PROCESS_MODE_DISABLED
 
 func _ready():
-	camera.set_current(is_authority())
+	if steam_id == SteamAccount.STEAM_ID:
+		camera.set_current(true)
 
 	if SteamLobby.is_host():
 		sendSpawnPacket()
@@ -92,20 +94,16 @@ func _onPacket(_steam_id: int, message: String, data: Dictionary):
 
 func onEntityMount(entity: Mountable):
 	velocity = Vector3.ZERO
-	collisionShape.disabled = true
-	axis_lock_linear_x = true
-	axis_lock_linear_y = true
-	axis_lock_linear_z = true
+	visible = false
+	process_mode = Node.PROCESS_MODE_DISABLED
 	mounted_to = entity
 	if is_authority():
 		camera.set_current(false)
 	
 func onEntityUnmount():
+	visible = true
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	velocity = Vector3.ZERO
-	collisionShape.disabled = false
-	axis_lock_linear_x = false
-	axis_lock_linear_y = false
-	axis_lock_linear_z = false
 	rotation = Vector3.ZERO
 	mounted_to = null
 	if is_authority():
@@ -115,7 +113,7 @@ func onPlayerMove(pos: Vector3, rotY: float, _velocity: Vector3, animation: Stri
 	position = pos
 	visual_char.rotation.y = rotY
 	velocity = _velocity
-	print(str(steam_id) + ": " + str(velocity))
+	
 	if animation.length() > 0:
 		anim_player.play(animation)
 
@@ -159,6 +157,10 @@ func _physics_process(delta):
 	if !is_authority():
 		move_and_slide()
 		return
+
+	if position.y < -10:
+		position = Vector3(0, 10, 0)
+		velocity = Vector3.ZERO
 		
 	update_closest_interactable();
 	
@@ -230,10 +232,6 @@ func play_animation():
 var closest_interactable : Interactable = null
 
 func update_closest_interactable():
-	# no interactions while in car for now.
-	if mounted_to != null:
-		return
-	
 	
 	var interactables = InteractionManager.get_interactables()
 	var closest_distance = INF
@@ -241,7 +239,7 @@ func update_closest_interactable():
 	var player_pos = self.global_transform.origin
 
 	for interactable in interactables:
-		if 'global_transform' in interactable:
+		if interactable != null && 'global_transform' in interactable:
 			var object_pos = interactable.global_transform.origin
 			var distance = player_pos.distance_to(object_pos)
 			if distance < closest_distance:
@@ -253,13 +251,16 @@ func update_closest_interactable():
 	else: 
 		closest_interactable = null
 		
-	interact_label.visible = closest_interactable != null
+	label.visible = closest_interactable != null
 	
 	if closest_interactable != null:
 		if 'interact_message' in closest_interactable and closest_interactable.interact_message != null:
-			interact_label.text = closest_interactable.interact_message
+			label.text = closest_interactable.interact_message
 	
 	if Input.is_action_just_pressed("interact") and closest_interactable != null:
+		if mounted_to != null and closest_interactable != mounted_to:
+			print("Cannot interact with other objects while mounted. ")
+			return
 		if closest_interactable.has_method("interact"):
 			closest_interactable.interact()
 		else:

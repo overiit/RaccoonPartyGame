@@ -1,55 +1,15 @@
-[gd_scene load_steps=9 format=3 uid="uid://clx3bkpfjo3f5"]
+[gd_scene load_steps=4 format=3 uid="uid://clx3bkpfjo3f5"]
 
 [ext_resource type="PackedScene" uid="uid://dxxdix324dcs1" path="res://models/entities/vehicles/jeep_babycar.blend" id="1_7nl5r"]
 [ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_controller.gd" id="2_3220l"]
-[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_base.gd" id="2_kyuhu"]
-[ext_resource type="Texture2D" uid="uid://ohex8wdan8b7" path="res://utils/textures/texture.png" id="4_romwr"]
-[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_mount.gd" id="6_1inwd"]
-[ext_resource type="PackedScene" uid="uid://b60mlume3trkq" path="res://scenes/entities/vehicles/util/WheelSet.tscn" id="7_nnha0"]
 [ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_camera.gd" id="8_m108d"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jw7fp"]
-albedo_texture = ExtResource("4_romwr")
-
-[node name="jeep_babycar_controller" instance=ExtResource("1_7nl5r")]
+[node name="jeep_babycar_controller" node_paths=PackedStringArray("camera") instance=ExtResource("1_7nl5r")]
+process_mode = 4
 script = ExtResource("2_3220l")
+camera = NodePath("Camera3D")
 
-[node name="Car-rigid" parent="." index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.445529, 0)
-script = ExtResource("2_kyuhu")
-variable_torque_split = true
-front_variable_split = 0.5
-front_damping_ratio = 0.6
-rear_damping_ratio = 0.6
-
-[node name="Car-rigid" parent="Car-rigid" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0734158, 0)
-material_override = SubResource("StandardMaterial3D_jw7fp")
-
-[node name="CollisionShape3D" parent="Car-rigid" index="1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0734158, 0)
-
-[node name="WheelSet" parent="Car-rigid" index="2" instance=ExtResource("7_nnha0")]
-
-[node name="BackLeft2" parent="Car-rigid/WheelSet" index="2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 0.26, 1.35224)
-
-[node name="BackRight" parent="Car-rigid/WheelSet" index="3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.26, 1.35224)
-
-[node name="VehicleMount" type="Node3D" parent="Car-rigid" index="3"]
-script = ExtResource("6_1inwd")
-interact_message = "Drive Jeep"
-auto_spawn = true
-entity_type = "jeep"
-
-[node name="Camera3D" type="Camera3D" parent="." index="1"]
+[node name="Camera3D" type="Camera3D" parent="." index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.616738, 4.34669, 5.95355)
 script = ExtResource("8_m108d")
 follow_height = 3
-
-[editable path="Car-rigid/WheelSet"]
-[editable path="Car-rigid/WheelSet/Frontleft/Wheel/wheel"]
-[editable path="Car-rigid/WheelSet/FrontRight2/Wheel/wheel"]
-[editable path="Car-rigid/WheelSet/BackLeft2/Wheel/wheel"]
-[editable path="Car-rigid/WheelSet/BackRight/Wheel/wheel"]

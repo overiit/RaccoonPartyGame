@@ -1,3 +1,4 @@
+@tool
 # Portions are Copyright (c) 2021 Dechode
 # https://github.com/Dechode/Godot-Advanced-Vehicle
 class_name Vehicle
@@ -13,7 +14,8 @@ var front_left_wheel : Wheel
 var front_right_wheel : Wheel
 var rear_left_wheel : Wheel
 var rear_right_wheel : Wheel
-@onready var controller: VehicleController = $".."
+@onready var controller: VehicleController = get_parent()
+
 
 @export_group("Steering")
 ## The rate the steering input changes to smooth input.
@@ -391,11 +393,32 @@ class Axle:
 			slip = maxf(slip, wheel.slip_vector.y)
 		return slip
 
+
+func _get_configuration_warnings():
+	var errors := []
+	if not get_parent() is VehicleController:
+		errors.append("Vehicle must be a child of VehicleController")
+
+	var found := false
+	for child in get_children():
+		if child is WheelSet:
+			found = true
+	
+	if not found:
+		errors.append("Vehicle must have a WheelSet child")
+
+	return PackedStringArray(errors)
+
 func _ready():
+	controller = get_parent()
 	SteamNetwork.onPacket.connect(onEntityMove)
+
 	audioStreamPlayer.autoplay = true;
 	audioStreamPlayer.volume_db = -24;
 	audioStreamPlayer.stream = stream;
+
+	controller.mount.onUnmounted.connect(_onUnmounted)
+	
 	add_child(audioStreamPlayer)
 
 	for child in get_children():
@@ -415,6 +438,9 @@ func _ready():
 		return
 
 	initialize()
+
+func _onUnmounted():
+	set_idle()
 
 func _integrate_forces(state : PhysicsDirectBodyState3D):
 	current_gravity = state.total_gravity
@@ -599,8 +625,8 @@ var target_global_position
 func onEntityMove(steam_id: int, message: String, data: Dictionary):
 	if message == "entity_move":
 		# Trust source
-		if steam_id == SteamLobby.host_id || controller.vehicle_mount.mounted_by == steam_id:
-			if controller.vehicle_mount.entity_id == data['id']:
+		if steam_id == SteamLobby.host_id || controller.mount.mounted_by == steam_id:
+			if controller.mount.entity_id == data['id']:
 				target_global_position = data['global_position']
 				global_transform = data['global_transform']
 				linear_velocity = data['linear_velocity']
@@ -609,7 +635,7 @@ func onEntityMove(steam_id: int, message: String, data: Dictionary):
 func _process(_delta):
 	if not is_ready:
 		return
-	if controller.vehicle_mount != null and controller.vehicle_mount.mounted_by != SteamAccount.STEAM_ID:
+	if controller.mount != null and controller.mount.mounted_by != SteamAccount.STEAM_ID:
 		if target_global_position != null:
 			global_position = global_position.lerp(target_global_position, 0.1)
 			
@@ -617,6 +643,12 @@ func _process(_delta):
 func _physics_process(delta):
 	if not is_ready:
 		return
+		
+	if global_position.y < -10.0:
+		set_idle()
+		global_position = Vector3(0, 10, 0)
+		return
+
 	process_audio()
 
 	## For stability calculations, we need the vehicle body inertia which isn't
@@ -630,12 +662,12 @@ func _physics_process(delta):
 	local_velocity = lerp(((global_transform.origin - previous_global_position) / delta) * global_transform.basis, local_velocity, 0.5)
 	previous_global_position = global_position
 	speed = local_velocity.length()
-	
+
 	process_drag()
 	process_braking(delta)
 	process_steering(delta)
-	process_throttle(delta)
-	if controller.vehicle_mount != null && controller.vehicle_mount.is_mounted():
+	if controller.mount != null && controller.mount.is_mounted():
+		process_throttle(delta)
 		process_motor(delta)
 		process_clutch(delta)
 		process_transmission(delta)
@@ -646,7 +678,7 @@ func _physics_process(delta):
 
 
 func process_audio():
-	if controller.vehicle_mount != null && controller.vehicle_mount.is_mounted():
+	if controller.mount != null && controller.mount.is_mounted():
 		audioStreamPlayer.stream_paused = false
 		audioStreamPlayer.pitch_scale = max(abs(motor_rpm / sample_rpm), 0.25)
 		audioStreamPlayer.volume_db = linear_to_db((throttle_amount * 0.5) + 0.5) - 35 # ear fix
@@ -880,16 +912,18 @@ func process_transmission(delta : float):
 			if not reversing:
 				if speed < 1.0 or local_velocity.z > 0.0:
 					if delta_time - last_shift_delta_time > shift_time || current_gear == 1:
-						# shift(-1) fix automatic transmission
-						if current_gear == 1:
-							shift(-2)
-						else:
-							shift(-1)
+						shift(-1)
+						# TODO? to skip 0 gear
+						# if current_gear == 1:
+						# 	shift(-2)
+						# else:
+						# 	shift(-1)
 			else:
 				if speed < 1.0 or local_velocity.z < 0.0:
 					if delta_time - last_shift_delta_time > shift_time:
-						# shift(1) fix automatic transmission
-						shift(2)
+						shift(1)
+						# TODO? to skip 0 gear
+						#shift(2)
 
 func process_drive(delta : float):
 	var current_gear_ratio := get_gear_ratio(current_gear)
@@ -1000,11 +1034,26 @@ func process_network():
 	controller.broadcast();
 
 func set_idle():
-		local_velocity = Vector3.ZERO
-		previous_global_position = Vector3.ZERO
-		speed = 0.0
-		motor_rpm = 0.0
-		steering_amount = 0.0
+	local_velocity = Vector3.ZERO
+	previous_global_position = Vector3.ZERO
+	speed = 0.0
+	motor_rpm = 0.0
+	steering_amount = 0.0
+	linear_velocity = Vector3.ZERO
+	angular_velocity = Vector3.ZERO
+	current_gear = 0
+	torque_output = 0
+	clutch_torque = 0
+	requested_gear = 0
+	throttle_input = 0
+	brake_input = 0
+	steering_input = 0
+	brake_amount = 0
+	need_clutch	= true
+
+
+
+	print("Vehicle set to idle")
 
 func manual_shift(count : int):
 	if not automatic_transmission:

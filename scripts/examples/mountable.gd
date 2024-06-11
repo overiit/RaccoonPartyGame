@@ -4,6 +4,7 @@ signal onMounted(steam_id: int)
 signal onUnmounted(steam_id: int)
 
 var mounted_by: int = 0
+@export var unmount_here: Node3D
 
 func _ready():
 	super._ready()
@@ -20,6 +21,11 @@ func _onPacket(steam_id: int, message: String, data: Dictionary):
 			if data["entity_id"] == entity_id:
 				mounted_by = 0
 				onUnmounted.emit(data["steam_id"])
+	if SteamLobby.is_host():
+		if message == "unmount":
+			if data["entity_id"] == entity_id:
+				unmount(data["steam_id"])
+
 
 func mount(steam_id: int):
 	if SteamLobby.is_host():
@@ -29,10 +35,11 @@ func mount(steam_id: int):
 		})
 		mounted_by = steam_id
 		onMounted.emit(steam_id)
-	else:
-		interact()
 	
 func unmount(steam_id: int):
+	if mounted_by != steam_id:
+		print("not mounted by this user")
+		return
 	if SteamLobby.is_host():
 		SteamNetwork.sendPacket(0, "unmount", {
 			"steam_id": steam_id,
@@ -40,8 +47,6 @@ func unmount(steam_id: int):
 		})
 		mounted_by = 0
 		onUnmounted.emit(steam_id)
-	else:
-		interact()
 
 # when a user successfully interacted with this
 func _onInteract(steam_id: int):
@@ -49,14 +54,11 @@ func _onInteract(steam_id: int):
 		print("not mountable")
 		# TODO Let user now and give them an alert, though it should show up anyways
 		return
-	if is_mounted():
-		if mounted_by == steam_id:
-			unmount(steam_id)
-		else:
-			print("already mounted by someone else")
-			# TODO Let user know and give them an alert
-	else:
+	if !is_mounted():
 		mount(steam_id)
+	else:
+		# user gets disabled from interacting while mounted
+		pass
 
 
 ########

@@ -1,13 +1,21 @@
+@tool
+
 # Portions are Copyright (c) 2021 Dechode
 # https://github.com/Dechode/Godot-Advanced-Vehicle
 
 # Portions are Copyright (c) 2024 Baron Wittman
 # https://lupine-vidya.itch.io/gdsim/devlog/677572/series-driving-simulator-workshop-mirror
-
 class_name Wheel
 extends RayCast3D
 
-@onready var wheel_node : Node3D 
+@onready var wheel_node : Node3D = get_child(0)
+
+func _get_configuration_warnings():
+	var warnings = []
+	if get_child_count() == 0:
+		warnings.append("Wheel node is not set.")
+	return PackedStringArray(warnings)
+
 
 var wheel_mass := 15.0
 var tire_radius := 0.45 # 0.3
@@ -68,9 +76,6 @@ var opposite_wheel : Wheel
 var beam_axle := 0.0
 
 var vehicle : RigidBody3D
-
-func _ready():
-	wheel_node = get_child(0)
 
 func _process(delta):
 	if wheel_node:

@@ -102,6 +102,14 @@ func receivedEntities(_data: Dictionary):
 	pass
 
 func spawnEntity(id: int, type: String, _position: Vector3, _rotation: Vector3):
+	if id == 0:
+		if SteamLobby.is_host():
+			id = Utils.genEntityId()
+			print("Warning: Spawning entity with ID 0, generating new ID: " + str(id))
+		else:
+			print("Warning: Failed spawning "  + str(id) + " as the ID is invalid")
+			return
+
 	if not GLOBAL_ENTITIES.has(type):
 		print("Warning: Entity type " + type + " does not exist")
 		return
@@ -113,18 +121,15 @@ func spawnEntity(id: int, type: String, _position: Vector3, _rotation: Vector3):
 		print("Warning: Failed spawning "  + str(id) + " as they already exist")
 		return
 
-	if id == 0:
-		if SteamLobby.is_host():
-			id = Utils.genEntityId()
-		else:
-			print("Warning: Failed spawning "  + str(id) + " as the ID is invalid")
-		return
-
 	var instance = scene.instantiate()
 	# entity might be a child of the instance
 	var entity = Utils.findNodeOfType(instance, Entity)
+	if entity == null:
+		print("Warning: Failed spawning "  + str(id) + " as the entity does not exist")
+		return
 	entity.set_entity(id, type)
 	get_tree().root.add_child(instance)
+	print("spawn entity: " + str(id) + " type: " + type)
 	entities[id] = entity
 	instance.position = _position
 	instance.rotation = _rotation

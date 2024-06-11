@@ -1,54 +1,21 @@
-[gd_scene load_steps=8 format=3 uid="uid://l3di0ug2q6ds"]
+[gd_scene load_steps=5 format=3 uid="uid://l3di0ug2q6ds"]
 
 [ext_resource type="PackedScene" uid="uid://dy18rqirn5b2p" path="res://models/entities/vehicles/sportscar_babycar.blend" id="1_5c2js"]
 [ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_controller.gd" id="2_qi7e1"]
-[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_base.gd" id="3_7wj8t"]
-[ext_resource type="Material" uid="uid://b3ri53ldiu7v" path="res://utils/default_material.tres" id="4_hjg0c"]
-[ext_resource type="PackedScene" uid="uid://b60mlume3trkq" path="res://scenes/entities/vehicles/util/WheelSet.tscn" id="5_pl5uq"]
+[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_mount.gd" id="4_5b81f"]
 [ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_camera.gd" id="6_iahr6"]
-[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_mount.gd" id="6_v0ik1"]
 
-[node name="sportscar_babycar" instance=ExtResource("1_5c2js")]
+[node name="sportscar_babycar" node_paths=PackedStringArray("camera") instance=ExtResource("1_5c2js")]
+process_mode = 4
 script = ExtResource("2_qi7e1")
+camera = NodePath("Camera3D")
 
-[node name="Car-rigid" parent="." index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.247158, 0)
-script = ExtResource("3_7wj8t")
-
-[node name="Car-rigid" parent="Car-rigid" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.103293, 0)
-material_override = ExtResource("4_hjg0c")
-
-[node name="CollisionShape3D" parent="Car-rigid" index="1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.103293, 0)
-
-[node name="WheelSet" parent="Car-rigid" index="2" instance=ExtResource("5_pl5uq")]
-
-[node name="Frontleft" parent="Car-rigid/WheelSet" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 0.26, -1.18553)
-
-[node name="FrontRight2" parent="Car-rigid/WheelSet" index="1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.26, -1.18553)
-
-[node name="BackLeft2" parent="Car-rigid/WheelSet" index="2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 0.26, 1.39937)
-
-[node name="BackRight" parent="Car-rigid/WheelSet" index="3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.26, 1.39937)
-
-[node name="VehicleMount" type="Node3D" parent="Car-rigid" index="3"]
-script = ExtResource("6_v0ik1")
-interact_message = "Drive Sports Car"
-auto_spawn = true
-entity_type = "sportscar"
-
-[node name="Camera3D" type="Camera3D" parent="." index="1"]
+[node name="Camera3D" type="Camera3D" parent="." index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.37184, 7.09271)
 script = ExtResource("6_iahr6")
 follow_height = 3
 
-[editable path="Car-rigid/WheelSet"]
-[editable path="Car-rigid/WheelSet/Frontleft/Wheel/wheel"]
-[editable path="Car-rigid/WheelSet/FrontRight2/Wheel/wheel"]
-[editable path="Car-rigid/WheelSet/BackLeft2/Wheel/wheel"]
-[editable path="Car-rigid/WheelSet/BackRight/Wheel/wheel"]
+[node name="VehicleMount" type="Node3D" parent="Car-rigid" index="2"]
+process_mode = 4
+visible = false
+script = ExtResource("4_5b81f")
