@@ -7,20 +7,19 @@ enum ViewMode { FIRST_PERSON, THIRD_PERSON }
 @onready var anim_player = $raccoony/AnimationPlayer
 @onready var camera_mount = $camera_mount
 @onready var visual_char = $raccoony
-@onready var interact_label = $Control/VBoxContainer/InteractLabel
+@onready var label = $Control/VBoxContainer/InteractLabel
+@onready var progressbar = $Control/VBoxContainer/ProgressBar
 @onready var collisionShape = $CollisionShape3D
 
 @export
 var PlayerViewMode = ViewMode.THIRD_PERSON
 
-const interact_distance_threshold = 1.5;
+const interact_distance_threshold = 3.0;
 
 const WALK_SPEED = 4.6
 const SPRINT_SPEED = 8.0
 var speed = WALK_SPEED
-
-var current_networked_position: Vector3 = Vector3.ZERO
-var next_networked_position: Vector3 = Vector3.ZERO
+var gravity = 20
 
 enum States {IDLE, RUN, SPRINT, JUMP, FALL, DROP_RUN_ROLL} 
 var state = States.IDLE
@@ -30,63 +29,93 @@ const JUMP_VELOCITY = 10.0
 @export var sens_horizontal = 0.5;
 @export var sens_vertical = 0.5;
 
-var health = 100
-var money = 0
-var items = []
-
-var gravity = 20
+var steam_id: int = 0
 
 var mounted_to : Mountable = null
 
+func set_authority(_steam_id: int):
+	steam_id = _steam_id
+	visible = true
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	EntityManager.players[steam_id] = self
+
+func _exit_tree():
+	if steam_id > 0:
+		EntityManager.players.erase(steam_id)
+
 func is_authority() -> bool:
-	return get_authority() == SteamAccount.STEAM_ID
-	
-func get_authority() -> int:
-	if has_meta("steam_id"):
-		return get_meta("steam_id")
-	return 0
+	return steam_id == SteamAccount.STEAM_ID
+
+func _init():
+	visible = false
+	process_mode = Node.PROCESS_MODE_DISABLED
 
 func _ready():
-	camera.set_current(is_authority())
-	SteamNetwork.onPacket.connect(_onPacket)
+	if steam_id == SteamAccount.STEAM_ID:
+		camera.set_current(true)
 
-func _onPacket(steam_id: int, message: String, data: Dictionary):
-	if message == "pos":
+	if SteamLobby.is_host():
+		sendSpawnPacket()
+
+	SteamNetwork.onPacket.connect(_onPacket)
+	SteamLobby.onPlayerConnected.connect(_onPlayerConnected)
+	SteamLobby.onPlayerLobbyLeft.connect(_onPlayerLobbyLeft)
+
+func sendSpawnPacket(to: int=0):
+	print("Send Spawn (" + str(steam_id) + ") to (" + str(to) + ")")
+	SteamNetwork.sendPacket(to, "spawn_player", {
+		"steam_id": steam_id,
+		"position": position,
+		"rotY": visual_char.rotation.y,
+		"animation": "Idle"
+	})
+
+func _onPlayerConnected(id: int):
+	if id == steam_id:
+		return
+	if !SteamLobby.is_host():
+		return
+	sendSpawnPacket(id)
+
+func _onPlayerLobbyLeft(id: int):
+	if not EntityManager.players.has(id):
+		return
+	EntityManager.players[id].queue_free()
+	EntityManager.players.erase(id);
+
+func _onPacket(_steam_id: int, message: String, data: Dictionary):
+	if message == "pos" && _steam_id == steam_id:
 		onPlayerMove(
-			steam_id,
-			Vector3(data['x'], data['y'], data['z']),
-			Vector3(0, data['rotY'], 0),
+			data['position'],
+			data['rotY'],
+			data['velocity'],
 			data['animation']
 		)
 
 func onEntityMount(entity: Mountable):
 	velocity = Vector3.ZERO
-	collisionShape.disabled = true
-	axis_lock_linear_x = true
-	axis_lock_linear_y = true
-	axis_lock_linear_z = true
+	visible = false
+	process_mode = Node.PROCESS_MODE_DISABLED
 	mounted_to = entity
 	if is_authority():
 		camera.set_current(false)
 	
 func onEntityUnmount():
+	visible = true
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	velocity = Vector3.ZERO
-	collisionShape.disabled = false
-	axis_lock_linear_x = false
-	axis_lock_linear_y = false
-	axis_lock_linear_z = false
 	rotation = Vector3.ZERO
 	mounted_to = null
 	if is_authority():
 		camera.set_current(true)
 
-func onPlayerMove(steam_id: int, pos: Vector3, rot: Vector3, animation: String):
-	if get_authority() == steam_id:
-		next_networked_position = pos
-		#position = pos
-		visual_char.rotation.y = rot.y
-		if animation.length() > 0:
-			anim_player.play(animation)
+func onPlayerMove(pos: Vector3, rotY: float, _velocity: Vector3, animation: String):
+	position = pos
+	visual_char.rotation.y = rotY
+	velocity = _velocity
+	
+	if animation.length() > 0:
+		anim_player.play(animation)
 
 func _unhandled_input(event):
 	if mounted_to != null:
@@ -111,25 +140,29 @@ func repositionCamera(relativeX, relativeY):
 
 	camera.look_at(camera_mount.global_transform.origin)	
 
-func _process(delta):
+func _process(_delta):
 	if !is_authority():
-		current_networked_position = current_networked_position.lerp(next_networked_position, 0.1)
-		position = current_networked_position
 		return
 	# TODO limit to 60 ticks even if game is 144 ticks
-	broadcastPosition();
-	
+
+func broadcastPosition():
+	SteamNetwork.sendPacket(0, "pos", {
+		"position": position,
+		"rotY": visual_char.rotation.y,
+		"velocity": velocity,
+		"animation": anim_player.current_animation
+	})
+
 func _physics_process(delta):
 	if !is_authority():
+		move_and_slide()
 		return
+
+	if position.y < -10:
+		position = Vector3(0, 10, 0)
+		velocity = Vector3.ZERO
 		
 	update_closest_interactable();
-	
-	if mounted_to != null:
-		if Input.is_action_just_pressed("jump"):
-			mounted_to.unmount()
-			pass
-		return
 	
 	repositionCamera(0, 0)
 	var input_dir = Input.get_vector("left", "right", "up", "down")
@@ -167,17 +200,11 @@ func _physics_process(delta):
 		velocity.x = 0
 		velocity.z = 0
 	
+	broadcastPosition()
+	
 	play_animation()
 	move_and_slide()
 
-func broadcastPosition(steam_id: int = 0):
-	SteamNetwork.sendPacket(0, "pos", {
-		"x": position.x,
-		"y": position.y,
-		"z": position.z,
-		"rotY": visual_char.rotation.y,
-		"animation": anim_player.current_animation,
-	}, false, Steam.P2P_SEND_UNRELIABLE_NO_DELAY)
 
 func play_animation():
 	match state:
@@ -205,10 +232,6 @@ func play_animation():
 var closest_interactable : Interactable = null
 
 func update_closest_interactable():
-	# no interactions while in car for now.
-	if mounted_to != null:
-		return
-	
 	
 	var interactables = InteractionManager.get_interactables()
 	var closest_distance = INF
@@ -216,7 +239,7 @@ func update_closest_interactable():
 	var player_pos = self.global_transform.origin
 
 	for interactable in interactables:
-		if 'global_transform' in interactable:
+		if interactable != null && 'global_transform' in interactable:
 			var object_pos = interactable.global_transform.origin
 			var distance = player_pos.distance_to(object_pos)
 			if distance < closest_distance:
@@ -228,13 +251,16 @@ func update_closest_interactable():
 	else: 
 		closest_interactable = null
 		
-	interact_label.visible = closest_interactable != null
+	label.visible = closest_interactable != null
 	
 	if closest_interactable != null:
 		if 'interact_message' in closest_interactable and closest_interactable.interact_message != null:
-			interact_label.text = closest_interactable.interact_message
+			label.text = closest_interactable.interact_message
 	
 	if Input.is_action_just_pressed("interact") and closest_interactable != null:
+		if mounted_to != null and closest_interactable != mounted_to:
+			print("Cannot interact with other objects while mounted. ")
+			return
 		if closest_interactable.has_method("interact"):
 			closest_interactable.interact()
 		else:

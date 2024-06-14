@@ -1,0 +1,59 @@
+[gd_scene load_steps=5 format=3 uid="uid://b7x8gx0qlua6j"]
+
+[ext_resource type="Script" path="res://scripts/GameLobby.gd" id="1_g738h"]
+[ext_resource type="PackedScene" uid="uid://1gfropwtqfbn" path="res://addons/GodotSky/GodotSky.tscn" id="2_pgr8u"]
+[ext_resource type="PackedScene" uid="uid://tu1hyuymiywq" path="res://models/maps/lobby.blend" id="2_v24rj"]
+[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_spawner.gd" id="6_dnvnj"]
+
+[node name="GameLobby" type="Node3D"]
+script = ExtResource("1_g738h")
+
+[node name="GodotSky" parent="." instance=ExtResource("2_pgr8u")]
+timeOfDay = 1400.0
+cloudCoverage = 0.0
+
+[node name="lobby" parent="." instance=ExtResource("2_v24rj")]
+
+[node name="Canvas" type="CanvasLayer" parent="."]
+
+[node name="Label" type="Label" parent="Canvas"]
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="Control" type="Control" parent="Canvas"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="Canvas/Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 25.0
+offset_top = 25.0
+offset_right = -25.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Canvas/Control/MarginContainer"]
+layout_mode = 2
+alignment = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Canvas/Control/MarginContainer/HBoxContainer"]
+layout_mode = 2
+alignment = 2
+
+[node name="Button" type="Button" parent="Canvas/Control/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "READY"
+
+[node name="VehicleSpawner" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.6122, 4.72873, 6.29702)
+script = ExtResource("6_dnvnj")
+entity_to_spawn = "jeep"

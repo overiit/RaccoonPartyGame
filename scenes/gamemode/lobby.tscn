@@ -1,14 +1,31 @@
-[gd_scene load_steps=7 format=3 uid="uid://b7x8gx0qlua6j"]
+[gd_scene load_steps=15 format=3 uid="uid://b7x8gx0qlua6j"]
 
-[ext_resource type="Script" path="res://scripts/GameLobby.gd" id="1_g738h"]
+[ext_resource type="Script" path="res://scripts/gamemode/lobby.gd" id="1_qcvtm"]
 [ext_resource type="PackedScene" uid="uid://1gfropwtqfbn" path="res://addons/GodotSky/GodotSky.tscn" id="2_pgr8u"]
 [ext_resource type="PackedScene" uid="uid://tu1hyuymiywq" path="res://models/maps/lobby.blend" id="2_v24rj"]
-[ext_resource type="Script" path="res://scripts/utils/EntitySpawner.gd" id="5_g56wh"]
-[ext_resource type="Script" path="res://scripts/debug.gd" id="5_o0ob8"]
-[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_spawner.gd" id="6_dnvnj"]
+[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_controller.gd" id="5_s07lv"]
+[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_camera.gd" id="6_mnohi"]
+[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_base.gd" id="7_pkqni"]
+[ext_resource type="PackedScene" uid="uid://dynf3uj2e1hlh" path="res://models/entities/vehicles/wheel.blend" id="8_be0nj"]
+[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_wheel_set.gd" id="8_tl4wn"]
+[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_wheel.gd" id="9_n6gdv"]
+[ext_resource type="Script" path="res://scripts/entities/vehicles/vehicle_mount.gd" id="10_8a460"]
 
-[node name="GameLobby" type="Node3D"]
-script = ExtResource("1_g738h")
+[sub_resource type="BoxMesh" id="BoxMesh_4cdgm"]
+size = Vector3(2.335, 0.53, 1.84)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_6oj01"]
+points = PackedVector3Array(1.14623, 0.263148, 0.92, -1.10675, -0.265, -0.875351, -1.10675, -0.265, 0.888526, -1.15414, 0.265, -0.913121, 1.10673, -0.265, -0.875351, 1.15413, 0.265, -0.913121, -1.14624, 0.263148, 0.92, 1.10673, -0.265, 0.888526)
+
+[sub_resource type="BoxMesh" id="BoxMesh_sfiwo"]
+size = Vector3(19.855, 0.385, 5.195)
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_0bgcp"]
+data = PackedVector3Array(-9.9275, 0.1925, 2.5975, 9.9275, 0.1925, 2.5975, -9.9275, -0.1925, 2.5975, 9.9275, 0.1925, 2.5975, 9.9275, -0.1925, 2.5975, -9.9275, -0.1925, 2.5975, 9.9275, 0.1925, -2.5975, -9.9275, 0.1925, -2.5975, 9.9275, -0.1925, -2.5975, -9.9275, 0.1925, -2.5975, -9.9275, -0.1925, -2.5975, 9.9275, -0.1925, -2.5975, 9.9275, 0.1925, 2.5975, 9.9275, 0.1925, -2.5975, 9.9275, -0.1925, 2.5975, 9.9275, 0.1925, -2.5975, 9.9275, -0.1925, -2.5975, 9.9275, -0.1925, 2.5975, -9.9275, 0.1925, -2.5975, -9.9275, 0.1925, 2.5975, -9.9275, -0.1925, -2.5975, -9.9275, 0.1925, 2.5975, -9.9275, -0.1925, 2.5975, -9.9275, -0.1925, -2.5975, 9.9275, 0.1925, 2.5975, -9.9275, 0.1925, 2.5975, 9.9275, 0.1925, -2.5975, -9.9275, 0.1925, 2.5975, -9.9275, 0.1925, -2.5975, 9.9275, 0.1925, -2.5975, -9.9275, -0.1925, 2.5975, 9.9275, -0.1925, 2.5975, -9.9275, -0.1925, -2.5975, 9.9275, -0.1925, 2.5975, 9.9275, -0.1925, -2.5975, -9.9275, -0.1925, -2.5975)
+
+[node name="GameLobby" type="Node3D" node_paths=PackedStringArray("spawnPoint")]
+script = ExtResource("1_qcvtm")
+spawnPoint = NodePath("Spawn")
 
 [node name="GodotSky" parent="." instance=ExtResource("2_pgr8u")]
 timeOfDay = 1400.0
@@ -21,7 +38,6 @@ cloudCoverage = 0.0
 [node name="Label" type="Label" parent="Canvas"]
 offset_right = 40.0
 offset_bottom = 23.0
-script = ExtResource("5_o0ob8")
 
 [node name="Control" type="Control" parent="Canvas"]
 layout_mode = 3
@@ -56,12 +72,86 @@ alignment = 2
 layout_mode = 2
 text = "READY"
 
-[node name="EntitySpawner" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.19816, 0)
-script = ExtResource("5_g56wh")
+[node name="Spawn" type="Node3D" parent="."]
+transform = Transform3D(0.999989, -0.00474728, 0, 0.00474728, 0.999989, 0, 0, 0, 1, 0, 0.968447, 1.96589)
 
-[node name="VehicleSpawner" type="Node3D" parent="." node_paths=PackedStringArray("entitySpawner")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.6122, 4.72873, 6.29702)
-script = ExtResource("6_dnvnj")
-entitySpawner = NodePath("../EntitySpawner")
-entity_to_spawn = "jeep"
+[node name="VehicleController" type="Node3D" parent="." node_paths=PackedStringArray("camera", "vehicle", "mount")]
+process_mode = 4
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.743909, 0)
+script = ExtResource("5_s07lv")
+camera = NodePath("VehicleCamera")
+vehicle = NodePath("Vehicle")
+mount = NodePath("Vehicle/VehicleMount")
+
+[node name="Vehicle" type="RigidBody3D" parent="VehicleController"]
+script = ExtResource("7_pkqni")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="VehicleController/Vehicle"]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0.0177913, 0.189766, 0)
+mesh = SubResource("BoxMesh_4cdgm")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="VehicleController/Vehicle"]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0.0177913, 0.189766, 0)
+shape = SubResource("ConvexPolygonShape3D_6oj01")
+
+[node name="WheelSet" type="Node3D" parent="VehicleController/Vehicle" node_paths=PackedStringArray("front_left_wheel", "front_right_wheel", "rear_left_wheel", "rear_right_wheel")]
+script = ExtResource("8_tl4wn")
+front_left_wheel = NodePath("FL2")
+front_right_wheel = NodePath("FR")
+rear_left_wheel = NodePath("BL2")
+rear_right_wheel = NodePath("BR")
+
+[node name="FR" type="RayCast3D" parent="VehicleController/Vehicle/WheelSet"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.853735, 0, -0.814422)
+script = ExtResource("9_n6gdv")
+
+[node name="Node3D" type="Node3D" parent="VehicleController/Vehicle/WheelSet/FR"]
+
+[node name="wheel" parent="VehicleController/Vehicle/WheelSet/FR/Node3D" instance=ExtResource("8_be0nj")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0)
+
+[node name="BR" type="RayCast3D" parent="VehicleController/Vehicle/WheelSet"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.900924, 0, 0.787101)
+script = ExtResource("9_n6gdv")
+
+[node name="Node3D" type="Node3D" parent="VehicleController/Vehicle/WheelSet/BR"]
+
+[node name="wheel" parent="VehicleController/Vehicle/WheelSet/BR/Node3D" instance=ExtResource("8_be0nj")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0)
+
+[node name="FL2" type="RayCast3D" parent="VehicleController/Vehicle/WheelSet"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.895797, 0, -0.837629)
+script = ExtResource("9_n6gdv")
+
+[node name="Node3D" type="Node3D" parent="VehicleController/Vehicle/WheelSet/FL2"]
+
+[node name="wheel" parent="VehicleController/Vehicle/WheelSet/FL2/Node3D" instance=ExtResource("8_be0nj")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
+
+[node name="BL2" type="RayCast3D" parent="VehicleController/Vehicle/WheelSet"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.849262, 0, 0.77946)
+script = ExtResource("9_n6gdv")
+
+[node name="Node3D" type="Node3D" parent="VehicleController/Vehicle/WheelSet/BL2"]
+
+[node name="wheel" parent="VehicleController/Vehicle/WheelSet/BL2/Node3D" instance=ExtResource("8_be0nj")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
+
+[node name="VehicleMount" type="Node3D" parent="VehicleController/Vehicle"]
+process_mode = 4
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.12032, 0)
+visible = false
+script = ExtResource("10_8a460")
+
+[node name="VehicleCamera" type="Camera3D" parent="VehicleController"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.74143, 4.89415)
+script = ExtResource("6_mnohi")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.910251, -0.414058, 0, 0.414058, 0.910251, 0, 0, 0, 1, 11.3642, 4.04337, 14.4344)
+mesh = SubResource("BoxMesh_sfiwo")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="MeshInstance3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_0bgcp")

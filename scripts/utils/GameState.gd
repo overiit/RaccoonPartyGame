@@ -27,7 +27,7 @@ var countdown: float = 0
 var READY_PLAYERS: Array = [];
 
 signal onSessionStateChange()
-signal onModeChange()
+# signal onModeChange()
 
 
 func _ready():
@@ -52,21 +52,29 @@ func _process(delta):
 ############
 
 func _handleStateChange():
+	var newScene = null
 	if sessionState == SessionState.WAITING_FOR_PLAYERS:
 		print("Switching to lobby...")
-		get_tree().change_scene_to_packed(LobbyScene)
+		newScene = LobbyScene
 	elif sessionState == SessionState.INGAME:
 		if mode == "test":
 			print("Switching to test mode")
-			get_tree().change_scene_to_packed(TestGamemode)
+			newScene = TestGamemode
 		elif mode == "race":
 			print("Switching to race mode")
-			get_tree().change_scene_to_packed(RaceGamemode)
+			newScene = RaceGamemode
 		else:
 			print("gamemode unkown: " + str(mode))
 	else:
 		print("state unknown: " + str(sessionState))
-
+	
+	if newScene != null:
+		EntityManager.clear()
+		get_tree().change_scene_to_packed(newScene)
+		onSessionStateChange.emit()
+	else:
+		print("No scene to switch to")
+		SteamLobby.leave()
 
 func startRound():
 	sessionState = SessionState.INGAME

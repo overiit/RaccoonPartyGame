@@ -1,85 +1,72 @@
 class_name Mountable extends Interactable
 
+signal onMounted(steam_id: int)
+signal onUnmounted(steam_id: int)
+
+var mounted_by: int = 0
+@export var unmount_here: Node3D
+
 func _ready():
 	super._ready()
-
-
-func onPacket(sender: int, message: String, data: Dictionary):
-	super.onPacket(sender, message, data)
-	if sender == SteamLobby.host_id:
-		if message == "mount" && data['entity_id'] == entity_id:
-			onMounted(data['steam_id'])
-		if message == "unmount" && data['steam_id'] == get_authority():
-			onUnmounted(data['steam_id'])
-
+	SteamNetwork.onPacket.connect(_onPacket)
+	onInteract.connect(_onInteract)
+	
+func _onPacket(steam_id: int, message: String, data: Dictionary):
+	if steam_id == SteamLobby.host_id:
+		if message == "mount":
+			if data["entity_id"] == entity_id:
+				mounted_by = data["steam_id"]
+				onMounted.emit(data["steam_id"])
+		elif message == "unmount":
+			if data["entity_id"] == entity_id:
+				mounted_by = 0
+				onUnmounted.emit(data["steam_id"])
 	if SteamLobby.is_host():
-		if message == "unmount" && data['steam_id'] == get_authority() && sender == data['steam_id']:
-			_handleUnmount(data['steam_id'])
+		if message == "unmount":
+			if data["entity_id"] == entity_id:
+				unmount(data["steam_id"])
 
-# when a user successfully mounted this, handle accordingly in the subclass
-func onMounted(steam_id: int):
-	set_mount(steam_id)
 
-func onUnmounted(steam_id: int):
-	unset_mount()
-
-func unmount(steam_id: int = SteamAccount.STEAM_ID):
-	if SteamLobby.is_host():
-		onUnmounted(SteamAccount.STEAM_ID)
-		SteamNetwork.sendPacket(0, "unmount", {
-			"steam_id": SteamAccount.STEAM_ID,
-			"entity_id": entity_id
-		})
-	else:
-		SteamNetwork.sendPacket(SteamLobby.host_id, "unmount", {
-			"steam_id": SteamAccount.STEAM_ID,
-			"entity_id": entity_id
-		})
-
-func _handleMount(steam_id: int):
+func mount(steam_id: int):
 	if SteamLobby.is_host():
 		SteamNetwork.sendPacket(0, "mount", {
 			"steam_id": steam_id,
 			"entity_id": entity_id,
 		})
-	onMounted(steam_id);
+		mounted_by = steam_id
+		onMounted.emit(steam_id)
 	
-func _handleUnmount(steam_id: int):
+func unmount(steam_id: int):
+	if mounted_by != steam_id:
+		print("not mounted by this user")
+		return
 	if SteamLobby.is_host():
 		SteamNetwork.sendPacket(0, "unmount", {
 			"steam_id": steam_id,
 			"entity_id": entity_id,
 		})
-	onUnmounted(steam_id);
+		mounted_by = 0
+		onUnmounted.emit(steam_id)
 
 # when a user successfully interacted with this
-func onInteract(steam_id: int):
-	super.onInteract(steam_id)
-	if !is_mountable():
+func _onInteract(steam_id: int):
+	if !is_interactable:
 		print("not mountable")
 		# TODO Let user now and give them an alert, though it should show up anyways
 		return
-	_handleMount(steam_id)
+	if !is_mounted():
+		mount(steam_id)
+	else:
+		# user gets disabled from interacting while mounted
+		pass
+
+
 ########
 # Util
 ########
 
-func set_mount(steam_id: int):
-	set_meta("steam_id", steam_id)
-
-func unset_mount():
-	remove_meta("steam_id")
-
-func is_mountable():
-	return !is_mounted()
-
 func is_mounted():
-	return get_authority() > 0
+	return mounted_by > 0
 
 func is_authority() -> bool:
-	return get_authority() == SteamAccount.STEAM_ID
-	
-func get_authority() -> int:
-	if has_meta("steam_id"):
-		return get_meta("steam_id")
-	return 0
+	return mounted_by == SteamAccount.STEAM_ID

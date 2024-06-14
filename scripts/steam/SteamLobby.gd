@@ -15,8 +15,11 @@ signal onHostChanged(to_steam_id: int)
 
 # # lobby
 signal onLobbyCreated(lobby_id: int)
-signal onLobbyJoined(lobby_id: int)
-signal onLobbyConnected(lobby_id: int)
+
+signal onLobbyJoined(lobby_id: int) # steam lobby created
+signal onLobbyConnected(lobby_id: int) # all peers connected
+signal onLobbyLoaded(lobby_id: int) # all gamestate synced
+
 signal onLobbyUpdated(lobby_id: int)
 signal onLobbyLeft(lobby_id: int)
 signal onLobbyReady(lobby_id: int)
@@ -61,7 +64,7 @@ func _check_Command_Line() -> void:
 func _process(_delta):
 	if lobby_id > 0:
 		# Get the host of the lobby
-		# TODO: Optimize this to only run on lobby update?
+		# TODO: Optimize this to only run on lobby update / when the host leaves / when the host changes
 		var new_host_id: int = Steam.getLobbyOwner(lobby_id)
 		if new_host_id != host_id:
 			host_id = new_host_id
@@ -78,9 +81,8 @@ func create() -> void:
 
 	clearLobbySession()
 	
+	clearLobbySession()
 	get_tree().change_scene_to_packed(ConnectingScene)
-
-	members.clear()
 
 	Steam.createLobby(Steam.LOBBY_TYPE_FRIENDS_ONLY, LOBBY_MAX_MEMBERS)
 
@@ -90,8 +92,8 @@ func join(_lobby_id: int) -> void:
 
 	print("Attempting to join lobby "+str(_lobby_id)+"...")
 	
-	get_tree().change_scene_to_packed(ConnectingScene)
 	clearLobbySession()
+	get_tree().change_scene_to_packed(ConnectingScene)
 	
 	Steam.joinLobby(_lobby_id)
 
@@ -107,6 +109,7 @@ func leave(backToMenu: bool=true) -> void:
 
 func clearLobbySession():
 	SteamNetwork.clearP2PConnections()
+	EntityManager.clear()
 	members.clear()
 	lobby_id = 0
 	is_ready = false
@@ -292,7 +295,9 @@ func _leave_Lobby() -> void:
 
 	
 func _handlePacket(steam_id: int, message: String, data: Dictionary):
-	if message == "ready":
+	if message == "connected":
+		onPlayerConnected.emit(steam_id)
+	elif message == "ready":
 		print("Ready from: " + str(steam_id))
 		onPlayerReady.emit(steam_id)
 	elif message == "unready":
